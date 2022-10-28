@@ -1,0 +1,90 @@
+type Users @model @auth(rules: [{allow: public}]) {
+  userId: ID!
+  userName: String
+  email: AWSEmail
+  phone: AWSPhone
+  bio: String
+  social_links: AWSJSON
+  profile_image: String
+  followUsersFollower: [FollowUsers] @hasMany(indexName: "byUser_followUsersFollower", fields: ["userId"])
+  followUsersReciever: [FollowUsers] @hasMany(indexName: "byUser_followUsersReciever", fields: ["userId"])
+  followClubs: [FollowClubs] @hasMany(indexName: "byUser_followClubs", fields: ["userId"])
+  clubs: [Clubs] @hasMany(indexName: "byUser_clubs", fields: ["userId"])
+  userTopics: [UserTopics] @hasMany(indexName: "byUser_userTopics", fields: ["userId"])
+  userChatSender: [UserChats] @hasMany(indexName: "byUser_userChatSender", fields: ["userId"])
+  userChatReciever: [UserChats] @hasMany(indexName: "byUser_userChatReciever", fields: ["userId"])
+  participants: [Participants] @hasMany(indexName: "byUser_participants", fields: ["userId"])
+  rooms: [Rooms] @hasMany(indexName: "byUser_rooms", fields: ["userId"])
+}
+
+type FollowUsers @model @auth(rules: [{allow: public}]) {
+  userIdFollower: ID! @index(name: "byUser_followUsersFollower")
+  userIdFollowed: ID! @index(name: "byUser_followUsersReciever")
+}
+
+type Topics @model @auth(rules: [{allow: public}]) {
+  topicId: ID!
+  name: String!
+  description: String
+  clubs: [Clubs] @hasMany(indexName: "byTopic_clubs", fields: ["topicId"])
+  userTopics: [UserTopics] @hasMany(indexName: "byTopic_userTopics", fields: ["topicId"])
+}
+
+type Clubs @model @auth(rules: [{allow: public}]) {
+  clubId: ID!
+  name: String!
+  userIdFounder2: ID! @index(name: "byUser_clubs")
+  topicId2: ID! @index(name: "byTopic_clubs")
+  topicId: Topics @belongsTo(fields: ["topicId2"])
+  userIdFounder: Users @belongsTo(fields: ["userIdFounder2"])
+  follow: [FollowClubs] @hasMany(indexName: "byClub_follow", fields: ["clubId"])
+}
+
+type FollowClubs @model @auth(rules: [{allow: public}]) {
+  clubId2: ID! @index(name: "byClub_follow")
+  userId2: ID! @index(name: "byUser_followClubs")
+  clubId: Clubs @belongsTo(fields: ["clubId2"])
+  userId: Users @belongsTo(fields: ["userId2"])
+}
+
+type UserTopics @model @auth(rules: [{allow: public}]) {
+  userId2: ID! @index(name: "byUser_userTopics")
+  topicId2: ID! @index(name: "byTopic_userTopics")
+  userId: Users @belongsTo(fields: ["userId2"])
+  topicId: Topics @belongsTo(fields: ["topicId2"])
+}
+
+type UserChats @model @auth(rules: [{allow: public}]) {
+  userChatId: ID!
+  content: String
+  userIdSender: ID! @index(name: "byUser_userChatSender")
+  userIdReciever: ID! @index(name: "byUser_userChatReciever")
+}
+
+type Rooms @model @auth(rules: [{allow: public}]) {
+  roomId: ID!
+  name: String!
+  description: String
+  dateTime: AWSDateTime
+  founderId2: ID! @index(name: "byUser_rooms")
+  founderId: Users @belongsTo(fields: ["founderId2"])
+  participants: [Participants] @hasMany(indexName: "byRoom_participants", fields: ["roomId"])
+}
+
+type Participants @model @auth(rules: [{allow: public}]) {
+  participantsId2: ID! @index(name: "byUser_participants")
+  role: String
+  joinDate: AWSDateTime
+  peeringId: ID!
+  roomId2: ID! @index(name: "byRoom_participants")
+  participantsId: Users @belongsTo(fields: ["participantsId2"])
+  roomId: Rooms @belongsTo(fields: ["roomId2"])
+  participantIdSender: [RoomChats] @hasMany(indexName: "byParticipants_participantIdSender", fields: ["participantsId2"])
+}
+
+type RoomChats @model @auth(rules: [{allow: public}]) {
+  roomChatId: ID!
+  content: String
+  participantIdSender2: ID! @index(name: "byParticipants_participantIdSender")
+  participantIdSender: Participants @belongsTo(fields: ["participantIdSender2"])
+} 

@@ -1,0 +1,14 @@
+{
+  "resourceName": "socialnetwork",
+  "policyUUID": "0b4406ae",
+  "bucketName": "socialnetworkbucket",
+  "storageAccess": "auth",
+  "guestAccess": [],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ],
+  "triggerFunction": "S3Trigger9717b10a",
+  "groupAccess": {}
+}

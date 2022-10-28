@@ -1,0 +1,6 @@
+{
+  "AppSyncApiName": "socialnetwork",
+  "DynamoDBBillingMode": "PAY_PER_REQUEST",
+  "DynamoDBEnableServerSideEncryption": false,
+  "AuthModeLastUpdated": "2022-10-28T18:27:15.889Z"
+}
