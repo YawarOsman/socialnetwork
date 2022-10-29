@@ -1,12 +1,15 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../helper/helper.dart';
 import '../models/Users.dart';
 import '../provider/data.dart';
 import '../provider/log.dart';
 import '../submodels/appBars/allMessagesAppBar.dart';
 import '../submodels/appBars/searchForUsrsAppBar.dart';
 import 'searchDetails.dart';
+import 'userMessages.dart';
 
 class SearchForUsers extends StatefulWidget {
   const SearchForUsers({Key? key}) : super(key: key);
@@ -19,6 +22,8 @@ class _SearchForUsersState extends State<SearchForUsers> {
   List<int> _topicsListIndex = [];
   String _searchvalue = '';
   late Stream<List<Users>?> _usersStream;
+  String _profileImage = '';
+  Helper helper = Helper();
 
   @override
   void initState() {
@@ -29,8 +34,12 @@ class _SearchForUsersState extends State<SearchForUsers> {
   Stream<List<Users>?> searchStream(String searchValue) async* {
     final streamOfUsers = await Amplify.DataStore.query(Users.classType,
         where: Users.USERNAME.eq(searchValue));
-
     yield streamOfUsers.length > 0 ? streamOfUsers : null;
+  }
+
+  Future futureprofileImages(String profile_image) async {
+    final imageUrl = await helper.getImages(profile_image);
+    return imageUrl;
   }
 
   @override
@@ -40,7 +49,6 @@ class _SearchForUsersState extends State<SearchForUsers> {
               appBar: PreferredSize(
                   child: SearchForUsersAppBar(
                     onSearch: (String searchValue) async {
-                      print('searchValue:$searchValue');
                       _searchvalue = searchValue;
                       _usersStream = searchStream(_searchvalue);
                       setState(() {});
@@ -78,8 +86,70 @@ class _SearchForUsersState extends State<SearchForUsers> {
                                   );
                                 } else if (snapshot.hasData) {
                                   List users = snapshot.data as List;
-                                  return ListTile(
-                                    title: Text(users.first.userName),
+                                  return InkWell(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  UserMessages(
+                                                    email: users.first.email,
+                                                  )));
+                                    },
+                                    overlayColor: MaterialStateProperty.all(
+                                        Colors.transparent),
+                                    child: ListTile(
+                                      contentPadding:
+                                          EdgeInsets.symmetric(vertical: 10),
+                                      title: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          users.first.profile_image != null
+                                              ? FutureBuilder(
+                                                  future: futureprofileImages(
+                                                      users.first
+                                                              .profile_image ??
+                                                          ''),
+                                                  builder:
+                                                      ((context, snapshot) {
+                                                    if (snapshot.hasData) {
+                                                      return CircleAvatar(
+                                                        radius: 17.0,
+                                                        backgroundImage:
+                                                            CachedNetworkImageProvider(
+                                                          _profileImage,
+                                                          errorListener: () {},
+                                                        ),
+                                                      );
+                                                    } else {
+                                                      return CircleAvatar(
+                                                        radius: 17.0,
+                                                        backgroundColor: context
+                                                                .read<Log>()
+                                                                .isDark
+                                                            ? Colors
+                                                                .grey.shade800
+                                                            : Colors
+                                                                .grey.shade300,
+                                                      );
+                                                    }
+                                                  }))
+                                              : CircleAvatar(
+                                                  radius: 17.0,
+                                                  backgroundColor: context
+                                                          .read<Log>()
+                                                          .isDark
+                                                      ? Colors.grey.shade800
+                                                      : Colors.grey.shade300,
+                                                ),
+                                          SizedBox(
+                                            width: 14,
+                                          ),
+                                          Text(users.first.userName),
+                                        ],
+                                      ),
+                                    ),
                                   );
                                 } else {
                                   return Text('No users found');

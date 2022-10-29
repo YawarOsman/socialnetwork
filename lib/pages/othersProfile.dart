@@ -42,7 +42,6 @@ class _ProfileState extends State<Profile> {
 
   @override
   void initState() {
-    print('sdfkajsdfkas');
     super.initState();
     socialLinkes =
         jsonDecode(context.read<Data>().userData.social_links ?? '{}');

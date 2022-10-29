@@ -5,7 +5,8 @@ import '../provider/log.dart';
 import '../submodels/appBars/messageAppBar.dart';
 
 class UserMessages extends StatefulWidget {
-  const UserMessages({Key? key}) : super(key: key);
+  UserMessages({Key? key, required this.email}) : super(key: key);
+  String email;
 
   @override
   State<UserMessages> createState() => _UserMessagesState();
@@ -14,6 +15,12 @@ class UserMessages extends StatefulWidget {
 class _UserMessagesState extends State<UserMessages> {
   final TextEditingController _messageController = TextEditingController();
   String _messageText = '';
+
+  @override
+  void initState() {
+    super.initState();
+    print(widget.email);
+  }
 
   @override
   Widget build(BuildContext context) {

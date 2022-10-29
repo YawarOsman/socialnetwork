@@ -36,6 +36,9 @@ class _SearchForUsersAppBarState extends State<SearchForUsersAppBar> {
                     borderRadius: BorderRadius.circular(12),
                     color: Theme.of(context).cardColor),
                 child: TextField(
+                  onChanged: (value) async {
+                    await widget.onSearch!(value);
+                  },
                   controller: _searchController,
                   cursorColor: Colors.green.shade600,
                   decoration: InputDecoration(

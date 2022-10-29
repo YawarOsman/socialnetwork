@@ -210,6 +210,7 @@ class _SignUpState extends State<SignUp> {
                     final _isEmailUsed = await Amplify.Auth.signIn(
                             username: _emailController.text, password: '123')
                         .then((value) async {
+                      await Amplify.Auth.signOut();
                       return false;
                     }).catchError((error) {
                       if (error.toString().contains('NotAuthorizedException')) {
@@ -260,6 +261,7 @@ class _SignUpState extends State<SignUp> {
                             print(errorMessage);
                           });
                         } else {
+                          print(error);
                           setState(() {
                             errorMessage = 'An error occured please try again';
                           });

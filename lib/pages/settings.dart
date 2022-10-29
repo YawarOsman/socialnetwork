@@ -347,10 +347,8 @@ class _SettingsState extends State<Settings> {
                               MaterialPageRoute(builder: (context) => SignIn()),
                               (route) => false);
                           await Amplify.Auth.signOut();
-                          data.setEmail('');
                           log.setIsLoggedIn(false);
                           data.removeEmail();
-                          // pop all pages and go to login page
                         } catch (e) {
                           debugPrint(e.toString());
                         }

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../provider/data.dart';
 import '../provider/log.dart';
+import 'userMessages.dart';
 
 class AllMessages extends StatefulWidget {
   const AllMessages({Key? key}) : super(key: key);
@@ -76,7 +77,15 @@ class _AllMessagesState extends State<AllMessages> {
                                 itemCount: 11,
                                 itemBuilder: (context, _index) => InkWell(
                                       onTap: () {
-                                        Navigator.pushNamed(context, '/chat');
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    UserMessages(
+                                                      //todo change this email to a dynamic one
+                                                      email:
+                                                          'yawarhama@gmail.com',
+                                                    )));
                                       },
                                       overlayColor: MaterialStateProperty.all(
                                           Colors.transparent),

@@ -109,7 +109,8 @@ class _SignInOTPState extends State<SignInOTP> {
                         fontSize: 30,
                         color: Colors.grey.shade500),
                     filled: true,
-                    fillColor: Colors.black12,
+                    fillColor:
+                        log.isDark ? Colors.grey.shade800 : Colors.black12,
                     enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide(width: 0)),
@@ -202,11 +203,11 @@ class _SignInOTPState extends State<SignInOTP> {
                               Navigator.popUntil(
                                   context, ModalRoute.withName('/home'));
                               Navigator.pushNamed(context, '/home');
-                              // data.setEmail(widget.email);
-                              // log.setIsLoggedIn(true);
-                              // if (await log.getIsFirstTime) {
-                              //   log.setIsFirstTime(false);
-                              // }
+                              data.setEmail(widget.email);
+                              log.setIsLoggedIn(true);
+                              if (await log.getIsFirstTime) {
+                                log.setIsFirstTime(false);
+                              }
                             }).catchError((error) {
                               errorMessage = '';
                               if (error

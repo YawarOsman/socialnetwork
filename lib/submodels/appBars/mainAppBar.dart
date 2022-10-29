@@ -54,7 +54,7 @@ class _MainAppBarState extends State<MainAppBar> {
             InkWell(
               borderRadius: BorderRadius.circular(40),
               onTap: () {
-                Navigator.pushNamed(context, '/messages');
+                Navigator.pushNamed(context, '/allmessages');
               },
               child: Padding(
                 padding: const EdgeInsets.all(6.0),

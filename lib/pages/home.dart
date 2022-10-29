@@ -1,4 +1,3 @@
-import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -6,7 +5,6 @@ import 'dart:developer' as dev;
 import '../helper/audiocall/api.dart';
 import '../helper/con.dart';
 import '../helper/helper.dart';
-import '../models/Users.dart';
 import '../provider/data.dart';
 import '../provider/log.dart';
 import '../submodels/bottomBar/mainBottonTabbar.dart';
@@ -56,7 +54,7 @@ class _HomeState extends State<Home> {
     getRooms();
     _connectivity.initialise(context);
     _connectivity.myStream.listen((source) {
-      setState(() => _source = source);
+      if (mounted) setState(() => _source = source);
     });
     super.initState();
   }
@@ -65,7 +63,7 @@ class _HomeState extends State<Home> {
     try {
       final rooms = await helper.getOpenedRooms(token);
       if (rooms != null) {
-        setState(() {});
+        if (mounted) setState(() {});
         List dataper = rooms['data'];
         List data = [];
         data.addAll(dataper);

@@ -277,6 +277,7 @@ class _SignInState extends State<SignIn> {
                                         'The email or password is incorrect';
                                     _passwordController.clear();
                                   });
+                                  Navigator.pop(context);
                                   return;
                                 }
                                 setState(() {
@@ -288,7 +289,6 @@ class _SignInState extends State<SignIn> {
                               });
                             } on AuthException catch (e) {
                               debugPrint(e.message);
-                              (context as Element).reassemble();
                             }
                           }
                         },
