@@ -2,10 +2,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../models/Users.dart';
 import '../../provider/data.dart';
 import '../../provider/log.dart';
 
 class MessageAppBar extends StatefulWidget {
+  Users? recieverData;
+  MessageAppBar({Key? key, required this.recieverData}) : super(key: key);
+
   @override
   State<MessageAppBar> createState() => _MessageAppBarState();
 }
@@ -47,7 +51,9 @@ class _MessageAppBarState extends State<MessageAppBar> {
                   width: 10,
                 ),
                 Text(
-                  'partners name',
+                  widget.recieverData != null
+                      ? widget.recieverData!.userName ?? ''
+                      : '',
                   style: TextStyle(
                     fontSize: 19,
                     fontWeight: FontWeight.w500,

@@ -101,8 +101,7 @@ class Data extends ChangeNotifier {
   String _email = '';
   late Users _userData;
   String _profileImage = '';
-  String _token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlrZXkiOiJmYzQ0ZDBiNy05NmE3LTQ4NTEtOWQ3Ni00YzgyNzc0ZWRiYzgiLCJwZXJtaXNzaW9ucyI6WyJhbGxvd19qb2luIl0sImlhdCI6MTY2NjgxMzI5MCwiZXhwIjoxNjY3NDE4MDkwfQ.r6gXDjEIdsc5ScYPKW5OjgggYCyIklXA8-ZS_f6UaaE';
+
   get email => _email;
 
   Users get userData => _userData;
@@ -147,7 +146,6 @@ class Data extends ChangeNotifier {
   get profileImage => _profileImage;
 
   List get rooms => _rooms;
-  get token => _token;
 
   void removeEmail() async {
     _email = '';
@@ -169,12 +167,12 @@ class Data extends ChangeNotifier {
   }
 
   Future setProfileImage() async {
-    String? profile_image = '';
-    if (userData.profile_image != null) {
-      profile_image = await helper.getImages(userData.profile_image ?? '');
-    }
-    _profileImage = profile_image ?? '';
-    notifyListeners();
+    // String? profile_image = '';
+    // if (userData.profile_image != null) {
+    //   profile_image = await helper.getImages(userData.profile_image ?? '');
+    // }
+    // _profileImage = profile_image ?? '';
+    // notifyListeners();
   }
 
   void setRooms(List rooms) async {

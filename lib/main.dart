@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'helper/helper.dart';
 import 'pages/forgotPassword.dart';
@@ -16,12 +17,13 @@ import 'pages/signup.dart';
 import 'pages/userMessages.dart';
 import 'provider/data.dart';
 import 'provider/log.dart';
+import 'provider/states.dart';
 
 bool isFirstTime = true;
 bool isDark = false;
 bool isLoggedIn = false;
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
   if (Platform.isIOS) {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
@@ -31,6 +33,7 @@ void main() async {
     ListenableProvider(create: (context) => Data()),
     ListenableProvider(create: (context) => Log()),
     ListenableProvider(create: (context) => Helper()),
+    ListenableProvider(create: (context) => States()),
   ], child: MainWidget()));
 }
 
@@ -47,6 +50,11 @@ class _MainWidgetState extends State<MainWidget> {
     super.initState();
 
     getLogData();
+    envLoad();
+  }
+
+  void envLoad() async {
+    await dotenv.load();
   }
 
   getLogData() async {

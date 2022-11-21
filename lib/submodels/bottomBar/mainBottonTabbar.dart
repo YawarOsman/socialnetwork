@@ -12,6 +12,7 @@ import '../../models/Participants.dart';
 import '../../pages/roomScreen.dart';
 import '../../provider/data.dart';
 import '../../provider/log.dart';
+import '../../provider/states.dart';
 import '../../widgets/reusableWidgets.dart';
 import '../style.dart';
 
@@ -48,8 +49,8 @@ class _BottomBarState extends State<BottomBar> {
 
     return DefaultTabController(
       length: 5,
-      child: Consumer2<Log, Data>(
-        builder: (context, log, data, child) => Container(
+      child: Consumer3<Log, Data, States>(
+        builder: (context, log, data, states, child) => Container(
           padding: EdgeInsets.only(bottom: Platform.isAndroid ? 0 : 5),
           color: Theme.of(context).scaffoldBackgroundColor,
           child: Column(
@@ -82,121 +83,7 @@ class _BottomBarState extends State<BottomBar> {
                     GestureDetector(
                       onTap: () {
                         _roomNameController.clear();
-                        if (isMeetingActive) {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => RoomScreen(
-                                        roomId: roomId,
-                                        token: token,
-                                        leaveRoom: () {
-                                          setState(
-                                              () => isMeetingActive = false);
-                                        },
-                                        endRoom: () {
-                                          setState(
-                                              () => isMeetingActive = false);
-                                        },
-                                      )));
-                        } else {
-                          showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                    contentPadding: EdgeInsets.only(
-                                        top: 20,
-                                        left: 20,
-                                        right: 20,
-                                        bottom: 10),
-                                    content: SizedBox(
-                                      width: MediaQuery.of(context).size.width -
-                                          40,
-                                      child: Form(
-                                        key: _roomNameKey,
-                                        child: TextFormField(
-                                          controller: _roomNameController,
-                                          validator: (value) {
-                                            return value!.isEmpty
-                                                ? 'Room name should not be empty'
-                                                : value.length <= 2
-                                                    ? 'Room name should be more that 2 characters'
-                                                    : null;
-                                          },
-                                          textAlignVertical:
-                                              TextAlignVertical.center,
-                                          decoration: InputDecoration(
-                                              hintText: "Enter Room Name",
-                                              contentPadding:
-                                                  EdgeInsets.symmetric(
-                                                      horizontal: 10,
-                                                      vertical: 5),
-                                              border: style.enabledBorder,
-                                              focusedBorder:
-                                                  style.focusedBorder,
-                                              enabledBorder:
-                                                  style.enabledBorder,
-                                              errorBorder: style.errorBorder),
-                                        ),
-                                      ),
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                          child: Text("Cancel"),
-                                          onPressed: () async {
-                                            Navigator.pop(context);
-                                          }),
-                                      TextButton(
-                                          onPressed: () async {
-                                            if (!_roomNameKey.currentState!
-                                                .validate()) return;
-
-                                            reusableWidgets
-                                                .showLoadingDialog(context);
-                                            roomId = await createMeeting();
-                                            setState(
-                                                () => isMeetingActive = true);
-                                            //add room data to room table in the database
-                                            Rooms room = Rooms(
-                                              roomId: roomId,
-                                              name: _roomNameController.text,
-                                              founderId: data.userData,
-                                            );
-                                            Participants participant =
-                                                Participants(
-                                                    participantsId:
-                                                        data.userData,
-                                                    role:
-                                                        role.creator.toString(),
-                                                    roomId: room,
-                                                    peeringId: uuid.v4());
-                                            await Amplify.DataStore.save(room);
-                                            await Amplify.DataStore.save(
-                                                participant);
-                                            Navigator.pop(context);
-                                            Navigator.pop(context);
-
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        RoomScreen(
-                                                          roomId: roomId,
-                                                          token: token,
-                                                          leaveRoom: () {
-                                                            setState(() =>
-                                                                isMeetingActive =
-                                                                    false);
-                                                          },
-                                                          endRoom: () {
-                                                            setState(() =>
-                                                                isMeetingActive =
-                                                                    false);
-                                                          },
-                                                        )));
-                                          },
-                                          child: Text("Create")),
-                                    ],
-                                  ));
-                        }
+                        createRoomBottomSheet(context, data);
                       },
                       child: Tab(
                         icon: Icon(
@@ -225,6 +112,159 @@ class _BottomBarState extends State<BottomBar> {
                     log.setSelectedTab = index;
                   }),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  createRoomBottomSheet(BuildContext context, Data data) async {
+    showModalBottomSheet(
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20), topRight: Radius.circular(20))),
+      context: context,
+      builder: (context) => Padding(
+        padding: MediaQuery.of(context).viewInsets,
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height * 0.3,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              children: [
+                Align(
+                  alignment: Alignment.center,
+                  child: Container(
+                    margin: EdgeInsets.only(top: 7),
+                    width: 30,
+                    height: 5,
+                    decoration: BoxDecoration(
+                        color: Colors.grey,
+                        borderRadius: BorderRadius.circular(10)),
+                  ),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Create a Room",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    Form(
+                      key: _roomNameKey,
+                      child: TextFormField(
+                        autofocus: true,
+                        controller: _roomNameController,
+                        validator: (value) {
+                          return value!.isEmpty
+                              ? 'Room name should not be empty'
+                              : value.length <= 2
+                                  ? 'Room name should be more that 2 characters'
+                                  : null;
+                        },
+                        textAlignVertical: TextAlignVertical.center,
+                        decoration: InputDecoration(
+                            hintText: "Enter Room Name",
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 0,
+                            ),
+                            border: InputBorder.none),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 50,
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(14),
+                              gradient: LinearGradient(colors: [
+                                Color.fromARGB(200, 84, 152, 71),
+                                Color.fromARGB(255, 54, 118, 255),
+                              ]),
+                            ),
+                            child: TextButton(
+                              style: ButtonStyle(
+                                textStyle: MaterialStateProperty.all(TextStyle(
+                                    fontSize: (Theme.of(context)
+                                                .textTheme
+                                                .bodyLarge!
+                                                .fontSize ??
+                                            14) *
+                                        1.3,
+                                    fontWeight: FontWeight.bold)),
+                                foregroundColor:
+                                    MaterialStateProperty.all(Colors.white),
+                              ),
+                              onPressed: () async {
+                                if (!_roomNameKey.currentState!.validate()) {
+                                  return;
+                                }
+                                reusableWidgets.showLoadingDialog(context);
+                                roomId = await createMeeting();
+                                setState(() => isMeetingActive = true);
+                                //add room data to room table in the database
+                                Rooms room = Rooms(
+                                  roomId: roomId,
+                                  name: _roomNameController.text,
+                                  founderId: data.userData,
+                                );
+                                Participants participant = Participants(
+                                    participantsId: data.userData,
+                                    role: role.creator.toString(),
+                                    roomId: room,
+                                    peeringId: uuid.v4());
+                                await Amplify.DataStore.save(room);
+                                await Amplify.DataStore.save(participant);
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => RoomScreen(
+                                              roomId: roomId,
+                                              token: token,
+                                              leaveRoom: () {
+                                                setState(() =>
+                                                    isMeetingActive = false);
+                                              },
+                                              endRoom: () {
+                                                setState(() =>
+                                                    isMeetingActive = false);
+                                              },
+                                            )));
+                              },
+                              child: Text("Create your Room"),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 15,
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            Navigator.pop(context);
+                          },
+                          child: Container(
+                            width: 50,
+                            child: Text("Cancel"),
+                          ),
+                        )
+                      ],
+                    )
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

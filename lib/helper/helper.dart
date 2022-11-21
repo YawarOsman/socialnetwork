@@ -125,11 +125,17 @@ class Helper extends ChangeNotifier {
   Future<Map> getOpenedRooms(String token) async {
     try {
       const url = 'https://api.videosdk.live/v2/rooms';
-      final http.Response response =
-          await http.get(Uri.parse(url), headers: {'Authorization': token});
+      final http.Response response = await http.get(Uri.parse(url),
+          headers: {'Authorization': token}).catchError((error) {
+        // TODO an error occured while geting rooms data
+        // TODO sho a diolog
+      });
+      // if (jsonDecode(response.body)["error"]
+      //     .contains('Token is expired or invalid')) {
+      //   // TODO token is expired
+      //   // TODO show a dialog
+      // }
 
-      // logDev.log(
-      //     '++++++++++++++++++++++++++++++++++: ${jsonDecode(response.body)['data']}');
       return jsonDecode(response.body);
     } catch (e) {
       return {};

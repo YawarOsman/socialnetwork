@@ -1,8 +1,9 @@
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
-String token =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlrZXkiOiJmYzQ0ZDBiNy05NmE3LTQ4NTEtOWQ3Ni00YzgyNzc0ZWRiYzgiLCJwZXJtaXNzaW9ucyI6WyJhbGxvd19qb2luIl0sImlhdCI6MTY2NjgxMzI5MCwiZXhwIjoxNjY3NDE4MDkwfQ.r6gXDjEIdsc5ScYPKW5OjgggYCyIklXA8-ZS_f6UaaE';
+final token = dotenv.env['TOKEN']!;
+
 Future<String> createMeeting() async {
   final http.Response httpResponse = await http.post(
     Uri.parse("https://api.videosdk.live/v1/meetings"),
