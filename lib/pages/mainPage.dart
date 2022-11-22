@@ -3,6 +3,7 @@ import 'dart:developer' as logDev;
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
+import 'package:videosdk/videosdk.dart';
 import '../main.dart';
 import '../provider/data.dart';
 import '../provider/log.dart';
@@ -151,23 +152,28 @@ class _MainPageState extends State<MainPage> {
     return GestureDetector(
       onTap: () {
         logDev.log('aaaaaaaa:${data.rooms[index]}');
-        final provider = Provider.of<States>(context, listen: false);
+        final states = Provider.of<States>(context, listen: false);
 
-        provider.setIsRoomPageMinimized = false;
-        provider.setIsRoomOpened = true;
+        states.setIsRoomPageMinimized = false;
+        log.setIsRoomActive = true;
         print(
-            '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!${provider.isRoomPageMinimized}');
-        provider.setRoomInstance = RoomScreen(
-          roomId: data.rooms[index]['roomId'],
-          id: data.rooms[index]['id'],
-          token: token,
-          leaveRoom: () {
-            log.setIsRoomActive = false;
-          },
-          endRoom: () {
-            log.setIsRoomActive = false;
-          },
-        );
+            '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!${states.isRoomPageMinimized}');
+        if (states.roomInstance != null) {
+          if (states.roomInstance!.roomId != data.rooms[index]['roomId']) {
+            states.setRoomLeaved = true;
+            states.setRoomInstance = RoomScreen(
+              roomId: data.rooms[index]['roomId'],
+              id: data.rooms[index]['id'],
+              token: token,
+            );
+          }
+        } else {
+          states.setRoomInstance = RoomScreen(
+            roomId: data.rooms[index]['roomId'],
+            id: data.rooms[index]['id'],
+            token: token,
+          );
+        }
       },
       child: Card(
         margin: EdgeInsets.only(bottom: 17, left: 13, right: 13),

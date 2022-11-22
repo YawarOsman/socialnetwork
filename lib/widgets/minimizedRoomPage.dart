@@ -29,7 +29,7 @@ class MinimizedRoomPage extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               color: Provider.of<Log>(context).isDark
-                  ? Color.fromARGB(255, 40, 40, 40)
+                  ? const Color.fromARGB(255, 40, 40, 40)
                   : Colors.white,
             ),
             child: Row(
@@ -40,22 +40,22 @@ class MinimizedRoomPage extends StatelessWidget {
                     children: [
                       Positioned(
                         child: CircleAvatar(
-                          backgroundColor: Colors.yellow,
+                          backgroundImage: AssetImage('assets/images/1.jpeg'),
                         ),
                       ),
                       Positioned(
                         left: 30,
                         child: CircleAvatar(
-                          backgroundColor: Colors.blue,
+                          backgroundImage: AssetImage('assets/images/2.jpeg'),
                         ),
                       ),
                       Positioned(
                         left: 60,
                         child: CircleAvatar(
-                          backgroundColor: Colors.red,
+                          backgroundImage: AssetImage('assets/images/3.jpeg'),
                         ),
                       ),
-                      Positioned(
+                      const Positioned(
                         left: 90,
                         child: CircleAvatar(
                           backgroundColor: Colors.black,

@@ -233,14 +233,6 @@ class _BottomBarState extends State<BottomBar> {
                                         builder: (context) => RoomScreen(
                                               roomId: roomId,
                                               token: token,
-                                              leaveRoom: () {
-                                                setState(() =>
-                                                    isMeetingActive = false);
-                                              },
-                                              endRoom: () {
-                                                setState(() =>
-                                                    isMeetingActive = false);
-                                              },
                                             )));
                               },
                               child: Text("Create your Room"),

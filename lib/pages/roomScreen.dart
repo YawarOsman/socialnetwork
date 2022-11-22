@@ -16,17 +16,13 @@ class RoomScreen extends StatefulWidget {
   final String roomId;
   final String? id;
   final String token;
-  final void Function() leaveRoom;
-  final void Function() endRoom;
 
-  const RoomScreen(
-      {Key? key,
-      this.id,
-      required this.roomId,
-      required this.token,
-      required this.leaveRoom,
-      required this.endRoom})
-      : super(key: key);
+  RoomScreen({
+    Key? key,
+    this.id,
+    required this.roomId,
+    required this.token,
+  }) : super(key: key);
 
   @override
   State<RoomScreen> createState() => _RoomScreenState();
@@ -117,176 +113,148 @@ class _RoomScreenState extends State<RoomScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height:
-          //Provider.of<States>(context, listen: false).isRoomPageMinimized
-          //     ? 200
-          //     :
-          MediaQuery.of(context).size.height -
-              MediaQueryData.fromWindow(WidgetsBinding.instance.window)
-                  .padding
-                  .top,
-      child: Scaffold(
-        body: Column(
-          children: [
-            Card(
-              elevation: 5,
-              margin: const EdgeInsets.all(0),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(0)),
-              child: Container(
-                padding: EdgeInsets.only(top: 10),
-                color: context.read<Log>().isDark
-                    ? Color.fromARGB(255, 22, 22, 22)
-                    : Colors.white,
-                height: 150,
-                child: Column(
-                  children: [
-                    Padding(
-                      padding:
-                          const EdgeInsets.only(left: 10, right: 15, bottom: 5),
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            GestureDetector(
-                                onTap: () {
-                                  Provider.of<States>(context, listen: false)
-                                      .setIsRoomPageMinimized = true;
-                                  print(
-                                      'dodododdododododdododododdododododododdodoododdo:${Provider.of<States>(context, listen: false).isRoomPageMinimized}');
-                                },
-                                child: Icon(
-                                  Icons.keyboard_arrow_down,
-                                  size: 30,
-                                )),
-                            GestureDetector(
-                                onTap: () {
-                                  if (!isRoomReady) {
-                                    return;
-                                  }
-                                  Provider.of<States>(context, listen: false)
-                                      .setIsRoomOpened = false;
-                                  Provider.of<States>(context, listen: false)
-                                      .setIsRoomPageMinimized = true;
-                                  room.end();
-                                },
-                                child: Text(
-                                  'End',
-                                  style: TextStyle(
-                                      color: Colors.red,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 17),
-                                )),
-                            GestureDetector(
-                                onTap: () async {
-                                  if (!isRoomReady) {
-                                    return;
-                                  }
-                                  final id = widget.id;
-                                  print(id);
-                                  final url =
-                                      'https://api.videosdk.live/v2/sessions/$id';
-                                  final http.Response response = await http.get(
-                                      Uri.parse(url),
-                                      headers: {'Authorization': token});
-                                  devlog.log(
-                                      '___++_+__+_+_+++_+_+_++_: ${jsonDecode(response.body)}');
-                                },
-                                child: Text(
-                                  'show',
-                                  style: TextStyle(
-                                      color: Colors.red,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 17),
-                                )),
-                            GestureDetector(
-                                onTap: () {
-                                  if (!isRoomReady) {
-                                    return;
-                                  }
-                                  Provider.of<States>(context, listen: false)
-                                      .setIsRoomOpened = false;
-                                  Provider.of<States>(context, listen: false)
-                                      .setIsRoomPageMinimized = true;
-                                  room.leave();
-                                },
-                                child: Text(
-                                  'Leave',
-                                  style: TextStyle(
-                                      color: Colors.red,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 17),
-                                )),
-                          ]),
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 15, right: 15),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 7),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text('Convince me to buy this'),
-                                      Text('Room ID: ${widget.roomId}'),
+    return SizedBox(
+      height: MediaQuery.of(context).size.height -
+          MediaQueryData.fromWindow(WidgetsBinding.instance.window).padding.top,
+      child: Consumer2<Log, States>(
+        builder: (context, log, states, child) => Scaffold(
+          body: Column(
+            children: [
+              Card(
+                elevation: 5,
+                margin: const EdgeInsets.all(0),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(0)),
+                child: Container(
+                  padding: const EdgeInsets.only(top: 10),
+                  color: context.read<Log>().isDark
+                      ? const Color.fromARGB(255, 22, 22, 22)
+                      : Colors.white,
+                  height: 150,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 10, right: 15, bottom: 5),
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              GestureDetector(
+                                  onTap: () {
+                                    states.setIsRoomPageMinimized = true;
+                                  },
+                                  child: Icon(
+                                    Icons.keyboard_arrow_down,
+                                    size: 30,
+                                  )),
+                              GestureDetector(
+                                  onTap: () {
+                                    if (!isRoomReady) {
+                                      return;
+                                    }
+                                    log.setIsRoomActive = false;
+                                    states.setIsRoomPageMinimized = true;
+                                    states.setRoomInstance = null;
+                                    room.end();
+                                  },
+                                  child: Text(
+                                    'End',
+                                    style: TextStyle(
+                                        color: Colors.red,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 17),
+                                  )),
+                              GestureDetector(
+                                  onTap: () {
+                                    if (!isRoomReady) {
+                                      return;
+                                    }
+                                    log.setIsRoomActive = false;
+                                    states.setIsRoomPageMinimized = true;
+                                    states.setRoomInstance = null;
+                                    room.leave();
+                                  },
+                                  child: Text(
+                                    'Leave',
+                                    style: TextStyle(
+                                        color: Colors.red,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 17),
+                                  )),
+                            ]),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 15, right: 15),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 7),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Text('Convince me to buy this'),
+                                        Text('Room ID: ${widget.roomId}'),
+                                      ],
+                                    ),
+                                  ),
+                                  Row(
+                                    children: const [
+                                      Icon(Icons.person_outline, size: 15),
+                                      SizedBox(
+                                        width: 5,
+                                      ),
+                                      Text('2/3'),
+                                      SizedBox(
+                                        width: 12,
+                                      ),
+                                      Text('Replays off'),
                                     ],
                                   ),
-                                ),
-                                Row(
-                                  children: [
-                                    Icon(Icons.person_outline, size: 15),
-                                    SizedBox(
-                                      width: 5,
-                                    ),
-                                    Text('2/3'),
-                                    SizedBox(
-                                      width: 12,
-                                    ),
-                                    Text('Replays off'),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 8),
-                              child: Text(
-                                'Created by John Doe',
-                                style:
-                                    TextStyle(fontSize: 12, color: Colors.grey),
+                                ],
                               ),
-                            ),
-                          ],
+                              const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 8),
+                                child: Text(
+                                  'Created by John Doe',
+                                  style: TextStyle(
+                                      fontSize: 12, color: Colors.grey),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    )
-                  ],
+                      )
+                    ],
+                  ),
                 ),
               ),
-            ),
-            Expanded(
-              child: GridView.builder(
-                itemCount: participantVideoStreams.values.length,
-                shrinkWrap: true,
-                padding: EdgeInsets.symmetric(vertical: 15, horizontal: 8),
-                itemBuilder: (context, index) => ParticipantTile(
-                  stream: participantVideoStreams.values.elementAt(index)!,
-                  roomId: widget.roomId,
-                  isSpeak: true,
+              Expanded(
+                child: GridView.builder(
+                  itemCount: participantVideoStreams.values.length,
+                  shrinkWrap: true,
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 15, horizontal: 8),
+                  itemBuilder: (context, index) => ParticipantTile(
+                    stream: participantVideoStreams.values.elementAt(index)!,
+                    roomId: widget.roomId,
+                    isSpeak: true,
+                  ),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisSpacing: 5,
+                      mainAxisSpacing: 5,
+                      crossAxisCount: 3),
                 ),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisSpacing: 5, mainAxisSpacing: 5, crossAxisCount: 3),
-              ),
-            )
-          ],
+              )
+            ],
+          ),
         ),
       ),
     );

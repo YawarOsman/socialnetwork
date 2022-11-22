@@ -1,7 +1,6 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:socialnetwork/pages/roomScreen.dart';
 import 'dart:developer' as dev;
 import '../helper/audiocall/api.dart';
 import '../helper/con.dart';
@@ -120,12 +119,12 @@ class _HomeState extends State<Home> {
                   bottomNavigationBar: BottomBar(),
                   body: Stack(alignment: Alignment.bottomCenter, children: [
                     _list.elementAt(log.selectedTab),
-                    (states.isRoomPageMinimized && states.isRoomOpened)
+                    (states.isRoomPageMinimized && log.isRoomActive)
                         ? MinimizedRoomPage()
                         : SizedBox(),
                   ]),
                 ),
-                states.isRoomOpened
+                log.isRoomActive
                     ? AnimatedContainer(
                         duration: Duration(milliseconds: 100),
                         height: states.isRoomPageMinimized
