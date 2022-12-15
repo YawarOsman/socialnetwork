@@ -14,35 +14,35 @@ class _AllMessagesAppBarState extends State<AllMessagesAppBar> {
   Widget build(BuildContext context) {
     return AppBar(
       iconTheme: Theme.of(context).iconTheme,
+      titleTextStyle: TextStyle(
+          color: Theme.of(context).textTheme.bodyLarge!.color, fontSize: 17),
       elevation: 1,
-      leadingWidth: 40,
-      toolbarHeight: 40,
-      leading: GestureDetector(
-        onTap: () {
-          Navigator.pop(context);
-        },
-        child: Container(
-          alignment: Alignment.topCenter,
-          padding: EdgeInsets.only(left: 13),
-          child: Icon(
-            Icons.arrow_back_ios,
-            size: 20,
+      automaticallyImplyLeading: false,
+      toolbarHeight: 47,
+      titleSpacing: 18,
+      title: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Container(
+              child: Icon(
+                Icons.arrow_back_ios,
+                size: 20,
+              ),
+            ),
           ),
-        ),
+          const Text('Messages'),
+          GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, '/searchForUsers');
+              },
+              child: Icon(Icons.search))
+        ],
       ),
-      actions: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/searchForUsers');
-                },
-                child: Icon(Icons.search))
-          ],
-        ),
-        SizedBox(width: 13),
-      ],
     );
   }
 }

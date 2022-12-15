@@ -161,6 +161,10 @@ class UserChats extends Model {
   Map<String, dynamic> toJson() => {
     'id': id, 'userChatId': _userChatId, 'content': _content, 'userIdSender': _userIdSender, 'userIdReciever': _userIdReciever, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
+  
+  Map<String, Object?> toMap() => {
+    'id': id, 'userChatId': _userChatId, 'content': _content, 'userIdSender': _userIdSender, 'userIdReciever': _userIdReciever, 'createdAt': _createdAt, 'updatedAt': _updatedAt
+  };
 
   static final QueryField ID = QueryField(fieldName: "id");
   static final QueryField USERCHATID = QueryField(fieldName: "userChatId");
@@ -180,6 +184,11 @@ class UserChats extends Model {
           ModelOperation.DELETE,
           ModelOperation.READ
         ])
+    ];
+    
+    modelSchemaDefinition.indexes = [
+      ModelIndex(fields: const ["userIdSender"], name: "byUser_userChatSender"),
+      ModelIndex(fields: const ["userIdReciever"], name: "byUser_userChatReciever")
     ];
     
     modelSchemaDefinition.addField(ModelFieldDefinition.id());

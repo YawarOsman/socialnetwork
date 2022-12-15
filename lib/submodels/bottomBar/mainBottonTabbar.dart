@@ -1,40 +1,35 @@
 import 'dart:io';
-
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:flashy_tab_bar2/flashy_tab_bar2.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:videosdk/videosdk.dart';
 import '../../helper/audiocall/api.dart';
 import '../../models/ModelProvider.dart';
-import '../../models/Participants.dart';
 import '../../pages/roomScreen.dart';
 import '../../provider/data.dart';
 import '../../provider/log.dart';
-import '../../provider/states.dart';
+import '../../provider/roomStates.dart';
 import '../../widgets/reusableWidgets.dart';
-import '../style.dart';
-
-enum role { creator, moderator, participant }
+import '../classModels/enums.dart';
 
 class BottomBar extends StatefulWidget {
+  const BottomBar({super.key});
+
   @override
   State<BottomBar> createState() => _BottomBarState();
 }
 
 class _BottomBarState extends State<BottomBar> {
   ReusableWidgets reusableWidgets = ReusableWidgets();
-  TextEditingController _roomNameController = TextEditingController();
-  GlobalKey<FormState> _roomNameKey = GlobalKey<FormState>();
-  Style style = Style();
-  int _selectedTab = 4;
-  double _roomSize = 40;
-  Color _iconColor = Colors.white;
-  int modelNumber = 10;
-  String roomId = "";
-  bool isMeetingActive = false;
-  var uuid = Uuid();
+  final TextEditingController _roomNameController = TextEditingController();
+  final GlobalKey<FormState> _roomNameKey = GlobalKey<FormState>();
+  int _selectedTab = 2;
+  String _roomId = "";
+  int _bottomPadding = 20;
 
   @override
   void setState(fn) {
@@ -44,91 +39,139 @@ class _BottomBarState extends State<BottomBar> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    _iconColor = Theme.of(context).iconTheme.color!;
+  void initState() {
+    super.initState();
+    setBottomPadding();
+  }
 
-    return DefaultTabController(
-      length: 5,
-      child: Consumer3<Log, Data, States>(
-        builder: (context, log, data, states, child) => Container(
-          padding: EdgeInsets.only(bottom: Platform.isAndroid ? 0 : 5),
-          color: Theme.of(context).scaffoldBackgroundColor,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                height: 0.5,
-                color: Colors.grey,
-              ),
-              TabBar(
-                  indicatorWeight: 0.1,
-                  indicatorColor: Colors.transparent,
-                  padding: EdgeInsets.symmetric(vertical: 4),
-                  tabs: [
-                    Tab(
-                      icon: Icon(
-                          _selectedTab == 0
-                              ? Icons.class_sharp
-                              : Icons.class_outlined,
-                          color: _iconColor),
-                    ),
-                    Tab(
-                      icon: Icon(
-                          _selectedTab == 1
-                              ? Icons.event_sharp
-                              : Icons.event_outlined,
-                          color: _iconColor),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        _roomNameController.clear();
-                        createRoomBottomSheet(context, data);
-                      },
-                      child: Tab(
-                        icon: Icon(
-                          Icons.add,
-                          color: Colors.green,
-                          size: 40,
+//this method is used to set the bottom padding of the bottom bar according to the device
+  void setBottomPadding() async {
+    if (Platform.isAndroid) {
+      _bottomPadding = 0;
+      setState(() {});
+      return;
+    }
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    IosDeviceInfo androidInfo = await deviceInfo.iosInfo;
+    String model = androidInfo.name!.replaceAll(RegExp(r'[^0-9]'), '');
+    if (int.parse(model) < 8) {
+      _bottomPadding = 0;
+      setState(() {});
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer3<Log, Data, RoomStates>(
+      builder: (context, log, data, states, child) => Container(
+        margin: EdgeInsets.only(bottom: _bottomPadding.toDouble()),
+        color: Theme.of(context).scaffoldBackgroundColor,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              height: 0.3,
+              color: Colors.grey,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 5),
+              child: SizedBox(
+                width: double.infinity,
+                height: MediaQuery.of(context).size.height * 0.05,
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          _selectedTab = 0;
+                          log.setSelectedTab = _selectedTab;
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Icon(
+                            _selectedTab == 0
+                                ? Icons.notification_add
+                                : Icons.notification_add_outlined,
+                            color: Theme.of(context).iconTheme.color,
+                          ),
                         ),
                       ),
-                    ),
-                    Tab(
-                      icon: Icon(
-                          _selectedTab == 3
-                              ? Icons.notification_add
-                              : Icons.notification_add_outlined,
-                          color: _iconColor),
-                    ),
-                    Tab(
-                      icon: Icon(
-                        _selectedTab == 4 ? Icons.home : Icons.home_outlined,
-                        color: _iconColor,
+                      InkWell(
+                          onTap: () {
+                            _selectedTab = 1;
+                            log.setSelectedTab = _selectedTab;
+                            _roomNameController.clear();
+                            createRoomBottomSheet(context, data, log);
+                          },
+                          child: Container(
+                            width: MediaQuery.of(context).size.width * 0.27,
+                            height: MediaQuery.of(context).size.height * 0.045,
+                            decoration: BoxDecoration(
+                                color: Colors.green,
+                                borderRadius: BorderRadius.circular(100)),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 5),
+                                  child: Text('+ ',
+                                      style: TextStyle(
+                                          fontSize: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.065,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                          fontFamily: 'NunitoBold')),
+                                ),
+                                Text('Room',
+                                    style: TextStyle(
+                                        fontSize:
+                                            MediaQuery.of(context).size.width *
+                                                0.045,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                        fontFamily: 'NunitoBold')),
+                              ],
+                            ),
+                          )),
+                      InkWell(
+                        onTap: () {
+                          _selectedTab = 2;
+                          log.setSelectedTab = _selectedTab;
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Icon(
+                            _selectedTab == 2
+                                ? Icons.home
+                                : Icons.home_outlined,
+                            color: Theme.of(context).iconTheme.color,
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
-                  onTap: (index) {
-                    _selectedTab = index;
-                    log.setSelectedTab = index;
-                  }),
-            ],
-          ),
+                    ]),
+              ),
+            )
+          ],
         ),
       ),
     );
   }
 
-  createRoomBottomSheet(BuildContext context, Data data) async {
+  createRoomBottomSheet(BuildContext context, Data data, Log log) async {
     showModalBottomSheet(
       isScrollControlled: true,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
               topLeft: Radius.circular(20), topRight: Radius.circular(20))),
       context: context,
       builder: (context) => Padding(
         padding: MediaQuery.of(context).viewInsets,
         child: SizedBox(
-          height: MediaQuery.of(context).size.height * 0.3,
+          height: MediaQuery.of(context).size.height * 0.25,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
@@ -136,7 +179,7 @@ class _BottomBarState extends State<BottomBar> {
                 Align(
                   alignment: Alignment.center,
                   child: Container(
-                    margin: EdgeInsets.only(top: 7),
+                    margin: const EdgeInsets.only(top: 7),
                     width: 30,
                     height: 5,
                     decoration: BoxDecoration(
@@ -144,14 +187,14 @@ class _BottomBarState extends State<BottomBar> {
                         borderRadius: BorderRadius.circular(10)),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       "Create a Room",
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -169,16 +212,16 @@ class _BottomBarState extends State<BottomBar> {
                                   : null;
                         },
                         textAlignVertical: TextAlignVertical.center,
-                        decoration: InputDecoration(
-                            hintText: "Enter Room Name",
+                        decoration: const InputDecoration(
+                            hintText: "What do you want to talk about?",
                             contentPadding: EdgeInsets.symmetric(
                               horizontal: 0,
                             ),
                             border: InputBorder.none),
                       ),
                     ),
-                    SizedBox(
-                      height: 50,
+                    const SizedBox(
+                      height: 30,
                     ),
                     Row(
                       children: [
@@ -186,7 +229,7 @@ class _BottomBarState extends State<BottomBar> {
                           child: Container(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(14),
-                              gradient: LinearGradient(colors: [
+                              gradient: const LinearGradient(colors: [
                                 Color.fromARGB(200, 84, 152, 71),
                                 Color.fromARGB(255, 54, 118, 255),
                               ]),
@@ -205,48 +248,84 @@ class _BottomBarState extends State<BottomBar> {
                                     MaterialStateProperty.all(Colors.white),
                               ),
                               onPressed: () async {
+                                final con =
+                                    await Connectivity().checkConnectivity();
+                                final ReusableWidgets reusableWidgets =
+                                    ReusableWidgets();
+                                if (con == ConnectivityResult.none) {
+                                  reusableWidgets.showSnackBarForConnectivity(
+                                      context, 'No Internet Connection');
+                                  Navigator.pop(context);
+                                  return;
+                                }
                                 if (!_roomNameKey.currentState!.validate()) {
                                   return;
                                 }
-                                reusableWidgets.showLoadingDialog(context);
-                                roomId = await createMeeting();
-                                setState(() => isMeetingActive = true);
+                                reusableWidgets.loadingDialog(context);
+                                _roomId = await createMeeting();
                                 //add room data to room table in the database
                                 Rooms room = Rooms(
-                                  roomId: roomId,
-                                  name: _roomNameController.text,
-                                  founderId: data.userData,
-                                );
+                                    roomId: _roomId,
+                                    name: _roomNameController.text,
+                                    founderId: data.userData,
+                                    roomStatus: Status.active);
                                 Participants participant = Participants(
-                                    participantsId: data.userData,
-                                    role: role.creator.toString(),
+                                    userId: data.userData,
+                                    role: Role.admin.toString(),
                                     roomId: room,
-                                    peeringId: uuid.v4());
+                                    participantStatus: Status.active);
                                 await Amplify.DataStore.save(room);
                                 await Amplify.DataStore.save(participant);
                                 Navigator.pop(context);
                                 Navigator.pop(context);
 
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => RoomScreen(
-                                              roomId: roomId,
-                                              token: token,
-                                            )));
+                                if (room == null) {
+                                  // TODO show a dialog error
+                                  return;
+                                }
+                                if (!mounted) return;
+                                final roomStates = context.read<RoomStates>();
+
+                                log.setIsRoomPageMinimized = false;
+                                if (log.isRoomActive) {
+                                  roomStates.videoSDK!.leave();
+                                }
+
+                                roomStates.setVideoSDK = VideoSDK.createRoom(
+                                  roomId: room.roomId,
+                                  token: token,
+                                  displayName: "Test Name",
+                                  micEnabled: false,
+                                  camEnabled: true,
+                                  maxResolution: 'hd',
+                                  defaultCameraIndex: 1,
+                                  notification: const NotificationInfo(
+                                    title: "Video SDK",
+                                    message:
+                                        "Video SDK is sharing screen in the meeting",
+                                    icon:
+                                        "notification_share", // drawable icon name
+                                  ),
+                                );
+
+                                roomStates.setRoomInstance = RoomScreen(
+                                  roomId: _roomId,
+                                );
+                                roomStates.videoSDK!.join();
+                                log.setIsRoomActive = true;
                               },
-                              child: Text("Create your Room"),
+                              child: const Text("Create your Room"),
                             ),
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           width: 15,
                         ),
                         TextButton(
                           onPressed: () async {
                             Navigator.pop(context);
                           },
-                          child: Container(
+                          child: const SizedBox(
                             width: 50,
                             child: Text("Cancel"),
                           ),

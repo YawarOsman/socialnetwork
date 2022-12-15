@@ -11,7 +11,7 @@ class Style {
 
   OutlineInputBorder enabledBorder = OutlineInputBorder(
     borderRadius: BorderRadius.circular(9),
-    borderSide: BorderSide(
+    borderSide: const BorderSide(
       color: Color.fromARGB(255, 165, 165, 165),
       width: 1,
     ),
@@ -19,7 +19,7 @@ class Style {
 
   OutlineInputBorder errorBorder = OutlineInputBorder(
     borderRadius: BorderRadius.circular(9),
-    borderSide: BorderSide(
+    borderSide: const BorderSide(
       color: Colors.red,
       width: 1,
     ),

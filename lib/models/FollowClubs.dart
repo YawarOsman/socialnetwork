@@ -119,6 +119,10 @@ class FollowClubs extends Model {
   Map<String, dynamic> toJson() => {
     'id': id, 'clubId': _clubId?.toJson(), 'userId': _userId?.toJson(), 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
+  
+  Map<String, Object?> toMap() => {
+    'id': id, 'clubId': _clubId, 'userId': _userId, 'createdAt': _createdAt, 'updatedAt': _updatedAt
+  };
 
   static final QueryField ID = QueryField(fieldName: "id");
   static final QueryField CLUBID = QueryField(
@@ -140,6 +144,11 @@ class FollowClubs extends Model {
           ModelOperation.DELETE,
           ModelOperation.READ
         ])
+    ];
+    
+    modelSchemaDefinition.indexes = [
+      ModelIndex(fields: const ["clubId2"], name: "byClub_follow"),
+      ModelIndex(fields: const ["userId2"], name: "byUser_followClubs")
     ];
     
     modelSchemaDefinition.addField(ModelFieldDefinition.id());

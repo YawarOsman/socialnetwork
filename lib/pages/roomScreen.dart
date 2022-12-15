@@ -1,27 +1,22 @@
-import 'dart:convert';
-
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:socialnetwork/main.dart';
+import 'package:socialnetwork/models/ModelProvider.dart';
+import 'package:socialnetwork/models/Rooms.dart';
+import 'package:socialnetwork/widgets/reusableWidgets.dart';
 import 'package:videosdk/videosdk.dart';
 import '../../helper/audiocall/participant_tile.dart';
-import 'package:http/http.dart' as http;
-import 'dart:developer' as devlog;
-import '../helper/audiocall/api.dart';
+import '../models/Participants.dart';
 import '../provider/data.dart';
 import '../provider/log.dart';
-import '../provider/states.dart';
+import '../provider/roomStates.dart';
+import '../provider/themeProvider.dart';
 
 class RoomScreen extends StatefulWidget {
   final String roomId;
-  final String? id;
-  final String token;
-
-  RoomScreen({
+  const RoomScreen({
     Key? key,
-    this.id,
     required this.roomId,
-    required this.token,
   }) : super(key: key);
 
   @override
@@ -29,10 +24,11 @@ class RoomScreen extends StatefulWidget {
 }
 
 class _RoomScreenState extends State<RoomScreen> {
-  Map<String, Stream?> participantVideoStreams = {};
-  bool micEnabled = false;
-  late Room room;
-  bool isRoomReady = false;
+  final Map<String, Stream?> _participantVideoStreams = {};
+  late Room _room;
+  bool _isRoomReady = false;
+  late RoomStates providerListener;
+  Rooms? _roomInfo;
 
   @override
   void setState(fn) {
@@ -44,14 +40,14 @@ class _RoomScreenState extends State<RoomScreen> {
   void setParticipantStreamEvents(Participant participant) {
     participant.on(Events.streamEnabled, (Stream stream) {
       if (stream.kind == 'video') {
-        participantVideoStreams[participant.id] = stream;
+        _participantVideoStreams[participant.id] = stream;
         setState(() {});
       }
     });
 
     participant.on(Events.streamDisabled, (Stream stream) {
       if (stream.kind == 'video') {
-        participantVideoStreams.remove(participant.id);
+        _participantVideoStreams.remove(participant.id);
         setState(() {});
       }
     });
@@ -60,55 +56,63 @@ class _RoomScreenState extends State<RoomScreen> {
   void setMeetingEventListener(Room _room) {
     setParticipantStreamEvents(_room.localParticipant);
 
-    _room.on(Events.roomJoined, () {
-      print('room Joined:');
-      setState(() => isRoomReady = true);
-    });
-
     _room.on(
       Events.participantJoined,
       (Participant participant) {
-        print('participant Joined: ${participant.id}');
+        print('participant Joineddddddddddddddddddddddd: ${participant.id}');
         setParticipantStreamEvents(participant);
       },
     );
 
     _room.on(Events.participantLeft, (String participantId) {
-      print('Participant left: $participantId');
-      if (participantVideoStreams.containsKey(participantId)) {
-        setState(() => participantVideoStreams.remove(participantId));
+      print(
+          'Participant lefttttttttttttttttttttttttttttttttttttttttttttttt: $participantId');
+      if (_participantVideoStreams.containsKey(participantId)) {
+        setState(() => _participantVideoStreams.remove(participantId));
       }
     });
+
+    _room.on(Events.roomJoined, () {
+      print('room Joineddddddddddddddddddddddddddddd:');
+      setState(() => _isRoomReady = true);
+    });
+
     _room.on(Events.roomLeft, () {
-      participantVideoStreams.clear();
-      print('Room left');
+      _participantVideoStreams.clear();
+      print('Room leftttttttttttttttttttttttttttttttttttttttttttttt');
+      if (!mounted) return;
+      context.read<Log>().setIsRoomActive = false;
+      context.read<Log>().setIsRoomPageMinimized = true;
     });
   }
 
   @override
   void initState() {
     super.initState();
-    // Create instance of Room (Meeting)
+    roomInfo();
+    providerListener = context.read<RoomStates>();
+    _room = providerListener.videoSDK!;
+    setMeetingEventListener(_room);
+    providerListener.addListener(() {
+      _room = providerListener.videoSDK!;
+      setMeetingEventListener(_room);
+    });
+    print('11111111111111');
+  }
 
-    room = VideoSDK.createRoom(
-      roomId: widget.roomId,
-      token: widget.token,
-      displayName: "Test Name",
-      micEnabled: micEnabled,
-      camEnabled: true,
-      maxResolution: 'hd',
-      defaultCameraIndex: 1,
-      notification: const NotificationInfo(
-        title: "Video SDK",
-        message: "Video SDK is sharing screen in the meeting",
-        icon: "notification_share", // drawable icon name
-      ),
-    );
+  void roomInfo() async {
+    await Amplify.DataStore.query(Rooms.classType,
+            where: Rooms.ROOMID.eq(widget.roomId))
+        .then((value) {
+      _roomInfo = value.first;
+      setState(() {});
+    });
+  }
 
-    setMeetingEventListener(room);
-
-    // Join meeting
-    room.join();
+  @override
+  void dispose() {
+    providerListener.removeListener(() {});
+    super.dispose();
   }
 
   @override
@@ -116,8 +120,8 @@ class _RoomScreenState extends State<RoomScreen> {
     return SizedBox(
       height: MediaQuery.of(context).size.height -
           MediaQueryData.fromWindow(WidgetsBinding.instance.window).padding.top,
-      child: Consumer2<Log, States>(
-        builder: (context, log, states, child) => Scaffold(
+      child: Consumer2<Log, RoomStates>(
+        builder: (context, log, roomStates, child) => Scaffold(
           body: Column(
             children: [
               Card(
@@ -127,10 +131,10 @@ class _RoomScreenState extends State<RoomScreen> {
                     borderRadius: BorderRadius.circular(0)),
                 child: Container(
                   padding: const EdgeInsets.only(top: 10),
-                  color: context.read<Log>().isDark
+                  color: context.read<ThemeProvider>().isDark
                       ? const Color.fromARGB(255, 22, 22, 22)
                       : Colors.white,
-                  height: 150,
+                  height: 125,
                   child: Column(
                     children: [
                       Padding(
@@ -138,43 +142,99 @@ class _RoomScreenState extends State<RoomScreen> {
                             left: 10, right: 15, bottom: 5),
                         child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               GestureDetector(
                                   onTap: () {
-                                    states.setIsRoomPageMinimized = true;
+                                    log.setIsRoomPageMinimized = true;
                                   },
-                                  child: Icon(
+                                  child: const Icon(
                                     Icons.keyboard_arrow_down,
                                     size: 30,
                                   )),
                               GestureDetector(
                                   onTap: () {
-                                    if (!isRoomReady) {
+                                    if (!_isRoomReady) {
                                       return;
                                     }
-                                    log.setIsRoomActive = false;
-                                    states.setIsRoomPageMinimized = true;
-                                    states.setRoomInstance = null;
-                                    room.end();
+                                    showDialog(
+                                        context: context,
+                                        builder: ((context) => AlertDialog(
+                                              backgroundColor: Theme.of(context)
+                                                  .scaffoldBackgroundColor,
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          13)),
+                                              title: const Text(
+                                                'You Sure About Ending The Room?',
+                                                style: TextStyle(fontSize: 18),
+                                              ),
+                                              actions: [
+                                                TextButton(
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                    },
+                                                    child: const Text('No')),
+                                                TextButton(
+                                                    onPressed: () {
+                                                      _room.end();
+
+                                                      Navigator.pop(context);
+                                                    },
+                                                    child: const Text('Yes')),
+                                              ],
+                                            )));
                                   },
-                                  child: Text(
-                                    'End',
-                                    style: TextStyle(
-                                        color: Colors.red,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 17),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 15, vertical: 3),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(14),
+                                      gradient: const LinearGradient(colors: [
+                                        Color.fromARGB(200, 84, 152, 71),
+                                        Color.fromARGB(255, 54, 118, 255),
+                                      ]),
+                                    ),
+                                    child: const Text(
+                                      'End',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 17),
+                                    ),
                                   )),
                               GestureDetector(
-                                  onTap: () {
-                                    if (!isRoomReady) {
-                                      return;
+                                  onTap: () async {
+                                    try {
+                                      if (_isRoomReady) {
+                                        _room.leave();
+                                        final userId = context
+                                            .read<Data>()
+                                            .userData!
+                                            .userId;
+                                        final participant =
+                                            await Amplify.DataStore.query(
+                                                Participants.classType,
+                                                where: Participants.USERID
+                                                    .eq(userId)
+                                                    .and(Participants.ROOMID
+                                                        .eq(widget.roomId)));
+                                        final firstParticipant =
+                                            participant.first;
+                                        final updatedParticipant =
+                                            firstParticipant.copyWith(
+                                                participantStatus:
+                                                    Status.inactive);
+                                        await Amplify.DataStore.save(
+                                            updatedParticipant);
+                                      }
+                                    } catch (e) {
+                                      print(e);
+                                      //todo: show a message dialog
                                     }
-                                    log.setIsRoomActive = false;
-                                    states.setIsRoomPageMinimized = true;
-                                    states.setRoomInstance = null;
-                                    room.leave();
                                   },
-                                  child: Text(
+                                  child: const Text(
                                     'Leave',
                                     style: TextStyle(
                                         color: Colors.red,
@@ -200,8 +260,8 @@ class _RoomScreenState extends State<RoomScreen> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        const Text('Convince me to buy this'),
-                                        Text('Room ID: ${widget.roomId}'),
+                                        Text(
+                                            '${_roomInfo != null ? _roomInfo!.name : ''}'),
                                       ],
                                     ),
                                   ),
@@ -236,23 +296,35 @@ class _RoomScreenState extends State<RoomScreen> {
                   ),
                 ),
               ),
-              Expanded(
-                child: GridView.builder(
-                  itemCount: participantVideoStreams.values.length,
-                  shrinkWrap: true,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 15, horizontal: 8),
-                  itemBuilder: (context, index) => ParticipantTile(
-                    stream: participantVideoStreams.values.elementAt(index)!,
-                    roomId: widget.roomId,
-                    isSpeak: true,
-                  ),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisSpacing: 5,
-                      mainAxisSpacing: 5,
-                      crossAxisCount: 3),
+              NotificationListener<OverscrollIndicatorNotification>(
+                onNotification: (overscroll) {
+                  overscroll.disallowIndicator();
+                  return true;
+                },
+                child: Expanded(
+                  child: _isRoomReady
+                      ? GridView.builder(
+                          itemCount: _participantVideoStreams.values.length,
+                          shrinkWrap: true,
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 15, horizontal: 8),
+                          itemBuilder: (context, index) => ParticipantTile(
+                            stream: _participantVideoStreams.values
+                                .elementAt(index)!,
+                            roomId: _room.id,
+                            isSpeak: true,
+                          ),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisSpacing: 5,
+                                  mainAxisSpacing: 5,
+                                  crossAxisCount: 3),
+                        )
+                      : const Center(
+                          child: CircularProgressIndicator(),
+                        ),
                 ),
-              )
+              ),
             ],
           ),
         ),

@@ -1,20 +1,20 @@
-import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:socialnetwork/provider/themeProvider.dart';
 import 'package:uuid/uuid.dart';
-
 import '../models/Users.dart';
 import '../provider/data.dart';
 import '../provider/log.dart';
 import '../widgets/reusableWidgets.dart';
-import 'home.dart';
 
 class SignInOTP extends StatefulWidget {
   SignInOTP(
-      {required this.email, required this.password, required this.username});
+      {super.key,
+      required this.email,
+      required this.password,
+      required this.username});
   String username;
   String email;
   String password;
@@ -31,15 +31,14 @@ class _SignInOTPState extends State<SignInOTP> {
   String errorMessage = '';
   final uuid = const Uuid();
 
-  void signIn() async {
-    print('looooooooo');
+  @override
+  void setState(fn) {
     if (mounted) {
-      print('1111111111');
-      setState(() {});
-    } else {
-      print('2222222222');
-      return;
+      super.setState(fn);
     }
+  }
+
+  void signIn() async {
     try {
       final data = Provider.of<Data>(context, listen: false);
 
@@ -91,14 +90,14 @@ class _SignInOTPState extends State<SignInOTP> {
                   }
                   if (value.length > 6) {
                     _otpController.text = value.substring(0, 6);
-                    _otpController.selection =
-                        TextSelection.fromPosition(TextPosition(offset: 6));
+                    _otpController.selection = TextSelection.fromPosition(
+                        const TextPosition(offset: 6));
                   }
                 },
                 focusNode: _otpFocusNode,
                 textAlign: TextAlign.center,
                 textAlignVertical: TextAlignVertical.center,
-                style: TextStyle(fontSize: 35, letterSpacing: 13),
+                style: const TextStyle(fontSize: 35, letterSpacing: 13),
                 controller: _otpController,
                 cursorColor: Colors.grey.shade400,
                 decoration: InputDecoration(
@@ -109,50 +108,51 @@ class _SignInOTPState extends State<SignInOTP> {
                         fontSize: 30,
                         color: Colors.grey.shade500),
                     filled: true,
-                    fillColor:
-                        log.isDark ? Colors.grey.shade800 : Colors.black12,
+                    fillColor: context.read<ThemeProvider>().isDark
+                        ? Colors.grey.shade800
+                        : Colors.black12,
                     enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(width: 0)),
+                        borderSide: const BorderSide(width: 0)),
                     focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(width: 0))),
+                        borderSide: const BorderSide(width: 0))),
               )),
             ),
-            SizedBox(
+            const SizedBox(
               height: 15,
             ),
             if (isTimedOut)
               Container(
-                  margin: EdgeInsets.only(top: 10),
+                  margin: const EdgeInsets.only(top: 10),
                   child: Text(
                     'The OTP code is invalid or expired',
                     style: TextStyle(fontSize: 13, color: Colors.red.shade600),
                   )),
             if (!isTimedOut)
               Container(
-                  margin: EdgeInsets.only(top: 10),
-                  child: Text(
+                  margin: const EdgeInsets.only(top: 10),
+                  child: const Text(
                     '2:45',
                     style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
                   )),
             if (errorMessage.isNotEmpty)
               Column(
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     height: 15,
                   ),
                   Text(
                     errorMessage,
-                    style: TextStyle(color: Colors.red),
+                    style: const TextStyle(color: Colors.red),
                   ),
                 ],
               ),
-            SizedBox(
+            const SizedBox(
               height: 30,
             ),
             Container(
-              margin: EdgeInsets.symmetric(horizontal: 50),
+              margin: const EdgeInsets.symmetric(horizontal: 50),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -168,7 +168,7 @@ class _SignInOTPState extends State<SignInOTP> {
                       onTap: () async {
                         try {
                           if (_otpController.text.isNotEmpty) {
-                            reusableWidgets.showLoadingDialog(context);
+                            reusableWidgets.loadingDialog(context);
                             Amplify.Auth.confirmSignUp(
                                     username: widget.email,
                                     confirmationCode: _otpController.text)
@@ -241,7 +241,7 @@ class _SignInOTPState extends State<SignInOTP> {
                       ),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 10,
                   ),
                   Container(
@@ -255,7 +255,7 @@ class _SignInOTPState extends State<SignInOTP> {
                     child: GestureDetector(
                       onTap: () async {
                         try {
-                          final resend = Amplify.Auth.resendSignUpCode(
+                          Amplify.Auth.resendSignUpCode(
                               username: widget.email);
                           print('done resent otp:');
                         } on AuthException catch (e) {

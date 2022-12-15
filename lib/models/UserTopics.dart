@@ -119,6 +119,10 @@ class UserTopics extends Model {
   Map<String, dynamic> toJson() => {
     'id': id, 'userId': _userId?.toJson(), 'topicId': _topicId?.toJson(), 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
+  
+  Map<String, Object?> toMap() => {
+    'id': id, 'userId': _userId, 'topicId': _topicId, 'createdAt': _createdAt, 'updatedAt': _updatedAt
+  };
 
   static final QueryField ID = QueryField(fieldName: "id");
   static final QueryField USERID = QueryField(
@@ -140,6 +144,11 @@ class UserTopics extends Model {
           ModelOperation.DELETE,
           ModelOperation.READ
         ])
+    ];
+    
+    modelSchemaDefinition.indexes = [
+      ModelIndex(fields: const ["userId2"], name: "byUser_userTopics"),
+      ModelIndex(fields: const ["topicId2"], name: "byTopic_userTopics")
     ];
     
     modelSchemaDefinition.addField(ModelFieldDefinition.id());

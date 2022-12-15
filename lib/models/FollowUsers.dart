@@ -132,6 +132,10 @@ class FollowUsers extends Model {
   Map<String, dynamic> toJson() => {
     'id': id, 'userIdFollower': _userIdFollower, 'userIdFollowed': _userIdFollowed, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
+  
+  Map<String, Object?> toMap() => {
+    'id': id, 'userIdFollower': _userIdFollower, 'userIdFollowed': _userIdFollowed, 'createdAt': _createdAt, 'updatedAt': _updatedAt
+  };
 
   static final QueryField ID = QueryField(fieldName: "id");
   static final QueryField USERIDFOLLOWER = QueryField(fieldName: "userIdFollower");
@@ -149,6 +153,11 @@ class FollowUsers extends Model {
           ModelOperation.DELETE,
           ModelOperation.READ
         ])
+    ];
+    
+    modelSchemaDefinition.indexes = [
+      ModelIndex(fields: const ["userIdFollower"], name: "byUser_followUsersFollower"),
+      ModelIndex(fields: const ["userIdFollowed"], name: "byUser_followUsersReciever")
     ];
     
     modelSchemaDefinition.addField(ModelFieldDefinition.id());

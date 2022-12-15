@@ -172,6 +172,10 @@ class Topics extends Model {
   Map<String, dynamic> toJson() => {
     'id': id, 'topicId': _topicId, 'name': _name, 'description': _description, 'clubs': _clubs?.map((Clubs? e) => e?.toJson()).toList(), 'userTopics': _userTopics?.map((UserTopics? e) => e?.toJson()).toList(), 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
+  
+  Map<String, Object?> toMap() => {
+    'id': id, 'topicId': _topicId, 'name': _name, 'description': _description, 'clubs': _clubs, 'userTopics': _userTopics, 'createdAt': _createdAt, 'updatedAt': _updatedAt
+  };
 
   static final QueryField ID = QueryField(fieldName: "id");
   static final QueryField TOPICID = QueryField(fieldName: "topicId");

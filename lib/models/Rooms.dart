@@ -34,6 +34,7 @@ class Rooms extends Model {
   final String? _name;
   final String? _description;
   final TemporalDateTime? _dateTime;
+  final Status? _roomStatus;
   final Users? _founderId;
   final List<Participants>? _participants;
   final TemporalDateTime? _createdAt;
@@ -81,6 +82,10 @@ class Rooms extends Model {
     return _dateTime;
   }
   
+  Status? get roomStatus {
+    return _roomStatus;
+  }
+  
   Users? get founderId {
     return _founderId;
   }
@@ -97,15 +102,16 @@ class Rooms extends Model {
     return _updatedAt;
   }
   
-  const Rooms._internal({required this.id, required roomId, required name, description, dateTime, founderId, participants, createdAt, updatedAt}): _roomId = roomId, _name = name, _description = description, _dateTime = dateTime, _founderId = founderId, _participants = participants, _createdAt = createdAt, _updatedAt = updatedAt;
+  const Rooms._internal({required this.id, required roomId, required name, description, dateTime, roomStatus, founderId, participants, createdAt, updatedAt}): _roomId = roomId, _name = name, _description = description, _dateTime = dateTime, _roomStatus = roomStatus, _founderId = founderId, _participants = participants, _createdAt = createdAt, _updatedAt = updatedAt;
   
-  factory Rooms({String? id, required String roomId, required String name, String? description, TemporalDateTime? dateTime, Users? founderId, List<Participants>? participants}) {
+  factory Rooms({String? id, required String roomId, required String name, String? description, TemporalDateTime? dateTime, Status? roomStatus, Users? founderId, List<Participants>? participants}) {
     return Rooms._internal(
       id: id == null ? UUID.getUUID() : id,
       roomId: roomId,
       name: name,
       description: description,
       dateTime: dateTime,
+      roomStatus: roomStatus,
       founderId: founderId,
       participants: participants != null ? List<Participants>.unmodifiable(participants) : participants);
   }
@@ -123,6 +129,7 @@ class Rooms extends Model {
       _name == other._name &&
       _description == other._description &&
       _dateTime == other._dateTime &&
+      _roomStatus == other._roomStatus &&
       _founderId == other._founderId &&
       DeepCollectionEquality().equals(_participants, other._participants);
   }
@@ -140,6 +147,7 @@ class Rooms extends Model {
     buffer.write("name=" + "$_name" + ", ");
     buffer.write("description=" + "$_description" + ", ");
     buffer.write("dateTime=" + (_dateTime != null ? _dateTime!.format() : "null") + ", ");
+    buffer.write("roomStatus=" + (_roomStatus != null ? enumToString(_roomStatus)! : "null") + ", ");
     buffer.write("founderId=" + (_founderId != null ? _founderId!.toString() : "null") + ", ");
     buffer.write("createdAt=" + (_createdAt != null ? _createdAt!.format() : "null") + ", ");
     buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt!.format() : "null"));
@@ -148,13 +156,14 @@ class Rooms extends Model {
     return buffer.toString();
   }
   
-  Rooms copyWith({String? id, String? roomId, String? name, String? description, TemporalDateTime? dateTime, Users? founderId, List<Participants>? participants}) {
+  Rooms copyWith({String? id, String? roomId, String? name, String? description, TemporalDateTime? dateTime, Status? roomStatus, Users? founderId, List<Participants>? participants}) {
     return Rooms._internal(
       id: id ?? this.id,
       roomId: roomId ?? this.roomId,
       name: name ?? this.name,
       description: description ?? this.description,
       dateTime: dateTime ?? this.dateTime,
+      roomStatus: roomStatus ?? this.roomStatus,
       founderId: founderId ?? this.founderId,
       participants: participants ?? this.participants);
   }
@@ -165,6 +174,7 @@ class Rooms extends Model {
       _name = json['name'],
       _description = json['description'],
       _dateTime = json['dateTime'] != null ? TemporalDateTime.fromString(json['dateTime']) : null,
+      _roomStatus = enumFromString<Status>(json['roomStatus'], Status.values),
       _founderId = json['founderId']?['serializedData'] != null
         ? Users.fromJson(new Map<String, dynamic>.from(json['founderId']['serializedData']))
         : null,
@@ -178,7 +188,11 @@ class Rooms extends Model {
       _updatedAt = json['updatedAt'] != null ? TemporalDateTime.fromString(json['updatedAt']) : null;
   
   Map<String, dynamic> toJson() => {
-    'id': id, 'roomId': _roomId, 'name': _name, 'description': _description, 'dateTime': _dateTime?.format(), 'founderId': _founderId?.toJson(), 'participants': _participants?.map((Participants? e) => e?.toJson()).toList(), 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
+    'id': id, 'roomId': _roomId, 'name': _name, 'description': _description, 'dateTime': _dateTime?.format(), 'roomStatus': enumToString(_roomStatus), 'founderId': _founderId?.toJson(), 'participants': _participants?.map((Participants? e) => e?.toJson()).toList(), 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
+  };
+  
+  Map<String, Object?> toMap() => {
+    'id': id, 'roomId': _roomId, 'name': _name, 'description': _description, 'dateTime': _dateTime, 'roomStatus': _roomStatus, 'founderId': _founderId, 'participants': _participants, 'createdAt': _createdAt, 'updatedAt': _updatedAt
   };
 
   static final QueryField ID = QueryField(fieldName: "id");
@@ -186,6 +200,7 @@ class Rooms extends Model {
   static final QueryField NAME = QueryField(fieldName: "name");
   static final QueryField DESCRIPTION = QueryField(fieldName: "description");
   static final QueryField DATETIME = QueryField(fieldName: "dateTime");
+  static final QueryField ROOMSTATUS = QueryField(fieldName: "roomStatus");
   static final QueryField FOUNDERID = QueryField(
     fieldName: "founderId",
     fieldType: ModelFieldType(ModelFieldTypeEnum.model, ofModelName: (Users).toString()));
@@ -205,6 +220,10 @@ class Rooms extends Model {
           ModelOperation.DELETE,
           ModelOperation.READ
         ])
+    ];
+    
+    modelSchemaDefinition.indexes = [
+      ModelIndex(fields: const ["founderId2"], name: "byUser_rooms")
     ];
     
     modelSchemaDefinition.addField(ModelFieldDefinition.id());
@@ -231,6 +250,12 @@ class Rooms extends Model {
       key: Rooms.DATETIME,
       isRequired: false,
       ofType: ModelFieldType(ModelFieldTypeEnum.dateTime)
+    ));
+    
+    modelSchemaDefinition.addField(ModelFieldDefinition.field(
+      key: Rooms.ROOMSTATUS,
+      isRequired: false,
+      ofType: ModelFieldType(ModelFieldTypeEnum.enumeration)
     ));
     
     modelSchemaDefinition.addField(ModelFieldDefinition.belongsTo(

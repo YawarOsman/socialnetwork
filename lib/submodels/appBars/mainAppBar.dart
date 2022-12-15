@@ -27,7 +27,7 @@ class _MainAppBarState extends State<MainAppBar> {
             InkWell(
               borderRadius: BorderRadius.circular(100),
               onTap: () {
-                Navigator.pushNamed(context, '/profile');
+                Scaffold.of(context).openDrawer();
               },
               child:
                   //  _profileImage != ''
@@ -48,7 +48,7 @@ class _MainAppBarState extends State<MainAppBar> {
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               width: 11,
             ),
             InkWell(
@@ -56,15 +56,15 @@ class _MainAppBarState extends State<MainAppBar> {
               onTap: () {
                 Navigator.pushNamed(context, '/allmessages');
               },
-              child: Padding(
-                padding: const EdgeInsets.all(6.0),
+              child: const Padding(
+                padding: EdgeInsets.all(6.0),
                 child: Icon(
                   Icons.message_outlined,
                   size: 22,
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               width: 5,
             ),
             InkWell(
@@ -72,15 +72,15 @@ class _MainAppBarState extends State<MainAppBar> {
               onTap: () {
                 Navigator.pushNamed(context, '/search');
               },
-              child: Padding(
-                padding: const EdgeInsets.all(6.0),
+              child: const Padding(
+                padding: EdgeInsets.all(6.0),
                 child: Icon(
                   Icons.search_sharp,
                   size: 23,
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               width: 10,
             ),
           ]),
@@ -98,8 +98,8 @@ class _MainAppBarState extends State<MainAppBar> {
       toolbarHeight: 47,
       automaticallyImplyLeading: false,
       iconTheme: widget.theme.iconTheme,
-      toolbarTextStyle: TextStyle(color: Colors.white),
-      titleTextStyle: TextStyle(color: Colors.white),
+      toolbarTextStyle: const TextStyle(color: Colors.white),
+      titleTextStyle: const TextStyle(color: Colors.white),
     );
   }
 }

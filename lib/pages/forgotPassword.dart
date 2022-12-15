@@ -2,17 +2,16 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-import '../submodels/style.dart';
+import '../submodels/classModels/enums.dart';
+import '../submodels/classModels/style.dart';
 import '../widgets/reusableWidgets.dart';
 
 class ForgotPassword extends StatefulWidget {
-  ForgotPassword({Key? key}) : super(key: key);
+  const ForgotPassword({Key? key}) : super(key: key);
 
   @override
   State<ForgotPassword> createState() => _ForgotPasswordState();
 }
-
-enum forgotPasswordPages { email, password, code }
 
 class _ForgotPasswordState extends State<ForgotPassword>
     with SingleTickerProviderStateMixin {
@@ -32,7 +31,7 @@ class _ForgotPasswordState extends State<ForgotPassword>
   bool _passwordVisible2 = true;
 
   String _errorMessage = '';
-  dynamic _forgotPageState = forgotPasswordPages.email;
+  dynamic _forgotPageState = ForgotPasswordPages.email;
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +41,7 @@ class _ForgotPasswordState extends State<ForgotPassword>
         padding: EdgeInsets.symmetric(
             horizontal: MediaQuery.of(context).size.width * 0.08),
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          if (_forgotPageState == forgotPasswordPages.email)
+          if (_forgotPageState == ForgotPasswordPages.email)
             SizedBox(
               child: Form(
                   key: _emailKey,
@@ -67,7 +66,7 @@ class _ForgotPasswordState extends State<ForgotPassword>
                     ),
                   )),
             ),
-          if (_forgotPageState == forgotPasswordPages.password)
+          if (_forgotPageState == ForgotPasswordPages.password)
             Column(
               children: [
                 SizedBox(
@@ -94,6 +93,12 @@ class _ForgotPasswordState extends State<ForgotPassword>
                           suffixIcon: Visibility(
                             visible: _passwordController1.text.isNotEmpty,
                             child: InkWell(
+                              onTap: () {
+                                _passwordVisible1 = !_passwordVisible1;
+                                setState(() {});
+                              },
+                              overlayColor:
+                                  MaterialStateProperty.all(Colors.transparent),
                               child: Icon(
                                 _passwordVisible1
                                     ? Icons.visibility
@@ -101,12 +106,6 @@ class _ForgotPasswordState extends State<ForgotPassword>
                                 size: 20,
                                 color: Theme.of(context).focusColor,
                               ),
-                              onTap: () {
-                                _passwordVisible1 = !_passwordVisible1;
-                                setState(() {});
-                              },
-                              overlayColor:
-                                  MaterialStateProperty.all(Colors.transparent),
                             ),
                           ),
                           focusedBorder: style.focusedBorder,
@@ -116,7 +115,7 @@ class _ForgotPasswordState extends State<ForgotPassword>
                         ),
                       )),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 15,
                 ),
                 SizedBox(
@@ -142,6 +141,12 @@ class _ForgotPasswordState extends State<ForgotPassword>
                           suffixIcon: Visibility(
                             visible: _passwordController2.text.isNotEmpty,
                             child: InkWell(
+                              overlayColor:
+                                  MaterialStateProperty.all(Colors.transparent),
+                              onTap: () {
+                                _passwordVisible2 = !_passwordVisible2;
+                                setState(() {});
+                              },
                               child: Icon(
                                 _passwordVisible2
                                     ? Icons.visibility
@@ -149,12 +154,6 @@ class _ForgotPasswordState extends State<ForgotPassword>
                                 size: 20,
                                 color: Theme.of(context).focusColor,
                               ),
-                              onTap: () {
-                                _passwordVisible2 = !_passwordVisible2;
-                                setState(() {});
-                              },
-                              overlayColor:
-                                  MaterialStateProperty.all(Colors.transparent),
                             ),
                           ),
                           focusedBorder: style.focusedBorder,
@@ -164,12 +163,12 @@ class _ForgotPasswordState extends State<ForgotPassword>
                         ),
                       )),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 15,
                 ),
               ],
             ),
-          if (_forgotPageState == forgotPasswordPages.code)
+          if (_forgotPageState == ForgotPasswordPages.code)
             SizedBox(
               child: Form(
                   key: _otpKey,
@@ -188,12 +187,12 @@ class _ForgotPasswordState extends State<ForgotPassword>
                       }
                       if (value.length > 6) {
                         _otpController.text = value.substring(0, 6);
-                        _otpController.selection =
-                            TextSelection.fromPosition(TextPosition(offset: 6));
+                        _otpController.selection = TextSelection.fromPosition(
+                            const TextPosition(offset: 6));
                       }
                     }),
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       letterSpacing: 15,
                       fontSize: 25,
                     ),
@@ -201,8 +200,8 @@ class _ForgotPasswordState extends State<ForgotPassword>
                     cursorColor: Theme.of(context).focusColor,
                     decoration: InputDecoration(
                       hintText: 'OTP Code',
-                      contentPadding: EdgeInsets.symmetric(vertical: 12),
-                      hintStyle: TextStyle(
+                      contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                      hintStyle: const TextStyle(
                           letterSpacing: 1,
                           fontSize: 14,
                           fontWeight: FontWeight.normal),
@@ -217,16 +216,16 @@ class _ForgotPasswordState extends State<ForgotPassword>
           if (_errorMessage.isNotEmpty)
             Column(
               children: [
-                SizedBox(
+                const SizedBox(
                   height: 15,
                 ),
                 Text(
                   _errorMessage,
-                  style: TextStyle(color: Colors.red),
+                  style: const TextStyle(color: Colors.red),
                 ),
               ],
             ),
-          SizedBox(
+          const SizedBox(
             height: 25,
           ),
           Row(
@@ -235,7 +234,7 @@ class _ForgotPasswordState extends State<ForgotPassword>
               GestureDetector(
                 onTap: () async {
                   try {
-                    if (_forgotPageState == forgotPasswordPages.email) {
+                    if (_forgotPageState == ForgotPasswordPages.email) {
                       _emailKey.currentState!.validate();
                       if (_emailController.text.isEmpty) return;
 
@@ -248,17 +247,17 @@ class _ForgotPasswordState extends State<ForgotPassword>
                         });
                         return;
                       }
-                      reusableWidgets.showLoadingDialog(context);
+                      reusableWidgets.loadingDialog(context);
                       await Amplify.Auth.resetPassword(
                         username: _emailController.text,
                       ).then((value) {
                         setState(() {
-                          _forgotPageState = forgotPasswordPages.password;
+                          _forgotPageState = ForgotPasswordPages.password;
                         });
                       });
                       Navigator.pop(context);
                     } else if (_forgotPageState ==
-                        forgotPasswordPages.password) {
+                        ForgotPasswordPages.password) {
                       _password1Key.currentState!.validate();
                       _password2Key.currentState!.validate();
                       if (_passwordController1.text.isEmpty ||
@@ -281,10 +280,10 @@ class _ForgotPasswordState extends State<ForgotPassword>
                         });
                         return;
                       }
-                      _forgotPageState = forgotPasswordPages.code;
+                      _forgotPageState = ForgotPasswordPages.code;
                       setState(() {});
-                    } else if (_forgotPageState == forgotPasswordPages.code) {
-                      reusableWidgets.showLoadingDialog(context);
+                    } else if (_forgotPageState == ForgotPasswordPages.code) {
+                      reusableWidgets.loadingDialog(context);
 
                       if (_otpController.text.isEmpty) return;
                       await Amplify.Auth.confirmResetPassword(
@@ -324,11 +323,11 @@ class _ForgotPasswordState extends State<ForgotPassword>
                           fontWeight: FontWeight.bold),
                     )),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 15,
               ),
               Visibility(
-                visible: _forgotPageState == forgotPasswordPages.code,
+                visible: _forgotPageState == ForgotPasswordPages.code,
                 child: InkWell(
                   overlayColor: MaterialStateProperty.all(Colors.transparent),
                   onTap: () async {

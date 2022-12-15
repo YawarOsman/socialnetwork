@@ -172,6 +172,10 @@ class Clubs extends Model {
   Map<String, dynamic> toJson() => {
     'id': id, 'clubId': _clubId, 'name': _name, 'topicId': _topicId?.toJson(), 'userIdFounder': _userIdFounder?.toJson(), 'follow': _follow?.map((FollowClubs? e) => e?.toJson()).toList(), 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
+  
+  Map<String, Object?> toMap() => {
+    'id': id, 'clubId': _clubId, 'name': _name, 'topicId': _topicId, 'userIdFounder': _userIdFounder, 'follow': _follow, 'createdAt': _createdAt, 'updatedAt': _updatedAt
+  };
 
   static final QueryField ID = QueryField(fieldName: "id");
   static final QueryField CLUBID = QueryField(fieldName: "clubId");
@@ -198,6 +202,11 @@ class Clubs extends Model {
           ModelOperation.DELETE,
           ModelOperation.READ
         ])
+    ];
+    
+    modelSchemaDefinition.indexes = [
+      ModelIndex(fields: const ["userIdFounder2"], name: "byUser_clubs"),
+      ModelIndex(fields: const ["topicId2"], name: "byTopic_clubs")
     ];
     
     modelSchemaDefinition.addField(ModelFieldDefinition.id());

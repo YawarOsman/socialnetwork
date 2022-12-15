@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../provider/log.dart';
-import '../provider/states.dart';
+import '../provider/roomStates.dart';
+import '../provider/themeProvider.dart';
 
 class MinimizedRoomPage extends StatelessWidget {
   const MinimizedRoomPage({
@@ -13,22 +13,18 @@ class MinimizedRoomPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Provider.of<States>(context, listen: false).setIsRoomPageMinimized =
-            false;
-
-        print(
-            'aaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaa:${Provider.of<States>(context, listen: false).isRoomPageMinimized}');
+        context.read<Log>().setIsRoomPageMinimized = false;
       },
       child: Card(
         elevation: 40,
-        margin: EdgeInsets.symmetric(horizontal: 11, vertical: 5),
+        margin: const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         child: Container(
             width: double.infinity,
-            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
-              color: Provider.of<Log>(context).isDark
+              color: context.read<ThemeProvider>().isDark
                   ? const Color.fromARGB(255, 40, 40, 40)
                   : Colors.white,
             ),
@@ -37,7 +33,7 @@ class MinimizedRoomPage extends StatelessWidget {
               children: [
                 Expanded(
                   child: Stack(
-                    children: [
+                    children: const [
                       Positioned(
                         child: CircleAvatar(
                           backgroundImage: AssetImage('assets/images/1.jpeg'),
@@ -55,7 +51,7 @@ class MinimizedRoomPage extends StatelessWidget {
                           backgroundImage: AssetImage('assets/images/3.jpeg'),
                         ),
                       ),
-                      const Positioned(
+                      Positioned(
                         left: 90,
                         child: CircleAvatar(
                           backgroundColor: Colors.black,
@@ -65,7 +61,7 @@ class MinimizedRoomPage extends StatelessWidget {
                     ],
                   ),
                 ),
-                Text(
+                const Text(
                   'Leave',
                   style: TextStyle(
                       fontSize: 16,

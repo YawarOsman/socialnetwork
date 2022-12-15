@@ -11,7 +11,8 @@ import '../../models/Users.dart';
 import '../helper/helper.dart';
 import '../provider/data.dart';
 import '../provider/log.dart';
-import '../submodels/style.dart';
+import '../provider/themeProvider.dart';
+import '../submodels/classModels/style.dart';
 
 class Profile extends StatefulWidget {
   Profile({Key? key}) : super(key: key);
@@ -44,7 +45,7 @@ class _ProfileState extends State<Profile> {
   void initState() {
     super.initState();
     socialLinkes =
-        jsonDecode(context.read<Data>().userData.social_links ?? '{}');
+        jsonDecode(context.read<Data>().userData!.social_links ?? '{}');
     setState(() {});
   }
 
@@ -54,8 +55,8 @@ class _ProfileState extends State<Profile> {
     swidth = mediaQueryData.size.width;
     sheight = mediaQueryData.size.height;
 
-    return Consumer3<Data, Log, Helper>(
-      builder: (context, data, log, helper, child) => Scaffold(
+    return Consumer4<Data, Log, Helper, ThemeProvider>(
+      builder: (context, data, log, helper, themeProvider, child) => Scaffold(
           appBar: AppBar(
             elevation: 0,
             automaticallyImplyLeading: false,
@@ -71,7 +72,7 @@ class _ProfileState extends State<Profile> {
               },
               child: Container(
                 padding: const EdgeInsets.all(8.0),
-                child: Icon(
+                child:const Icon(
                   Icons.arrow_back_ios,
                 ),
               ),
@@ -84,12 +85,12 @@ class _ProfileState extends State<Profile> {
                     children: [
                       GestureDetector(
                         onTap: () {},
-                        child: Icon(
+                        child:const Icon(
                           Icons.bookmark_outline,
                           size: 25,
                         ),
                       ),
-                      SizedBox(
+                    const  SizedBox(
                         width: 17,
                       ),
                       GestureDetector(
@@ -101,14 +102,14 @@ class _ProfileState extends State<Profile> {
                           size: 25,
                         ),
                       ),
-                      SizedBox(
+                     const SizedBox(
                         width: 17,
                       ),
                       GestureDetector(
                         onTap: () {
                           Navigator.pushNamed(context, '/settings');
                         },
-                        child: Icon(
+                        child:const Icon(
                           Icons.settings_outlined,
                           size: 25,
                         ),
@@ -155,9 +156,9 @@ class _ProfileState extends State<Profile> {
                                     Colors.green.shade400
                                   ],
                                 ),
-                                borderRadius: BorderRadius.only(
+                                borderRadius:const BorderRadius.only(
                                     bottomLeft: Radius.circular(50))),
-                            margin: EdgeInsets.only(bottom: 60),
+                            margin:const EdgeInsets.only(bottom: 60),
                           ),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 13),
@@ -179,18 +180,18 @@ class _ProfileState extends State<Profile> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              data.userData.userName!,
-                                              style: TextStyle(
+                                              data.userData!.userName!,
+                                              style:const TextStyle(
                                                   fontSize: 23,
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.w600),
                                             ),
-                                            SizedBox(
+                                          const   SizedBox(
                                               height: 3,
                                             ),
                                             Text(
-                                              data.userData.email!,
-                                              style: TextStyle(
+                                              data.userData!.email!,
+                                              style:const TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 15,
                                               ),
@@ -201,7 +202,7 @@ class _ProfileState extends State<Profile> {
                                       Row(
                                         children: [
                                           Column(
-                                            children: [
+                                            children:const [
                                               Text(
                                                 '0',
                                                 style: TextStyle(
@@ -216,11 +217,11 @@ class _ProfileState extends State<Profile> {
                                               ),
                                             ],
                                           ),
-                                          SizedBox(
+                                        const  SizedBox(
                                             width: 20,
                                           ),
                                           Column(
-                                            children: [
+                                            children:const [
                                               Text(
                                                 '12',
                                                 style: TextStyle(
@@ -235,11 +236,11 @@ class _ProfileState extends State<Profile> {
                                               ),
                                             ],
                                           ),
-                                          SizedBox(
+                                         const SizedBox(
                                             width: 20,
                                           ),
                                           Column(
-                                            children: [
+                                            children: const [
                                               Text(
                                                 '8',
                                                 style: TextStyle(
@@ -261,7 +262,7 @@ class _ProfileState extends State<Profile> {
                                 ),
                                 GestureDetector(
                                   onTap: onProfilePictureTapped(),
-                                  child: data.userData.profile_image != ''
+                                  child: data.userData!.profile_image != ''
                                       ?
                                       // FutureBuilder(
                                       //     future: helper.getImages(
@@ -311,15 +312,13 @@ class _ProfileState extends State<Profile> {
                           child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Container(
-                                  child: Text(
-                                    data.userData.bio == ''
-                                        ? 'Add bio'
-                                        : data.userData.bio ?? 'Add bio',
-                                    style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w500),
-                                  ),
+                                Text(
+                                  data.userData!.bio == ''
+                                      ? 'Add bio'
+                                      : data.userData!.bio ?? 'Add bio',
+                                  style:const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500),
                                 ),
                               ])),
                       Column(
@@ -336,7 +335,7 @@ class _ProfileState extends State<Profile> {
                                       fontSize: 15,
                                       color: Theme.of(context).primaryColor),
                                 ),
-                                Text(
+                               const Text(
                                   'Show All',
                                   style: TextStyle(
                                       color: Colors.blue,
@@ -348,7 +347,7 @@ class _ProfileState extends State<Profile> {
                           ),
                           Container(
                             height: 185,
-                            padding: EdgeInsets.only(left: 10),
+                            padding:const EdgeInsets.only(left: 10),
                             child: ListView.builder(
                                 shrinkWrap: true,
                                 itemCount: data.names.length,
@@ -357,7 +356,7 @@ class _ProfileState extends State<Profile> {
                                     GestureDetector(
                                       onTap: () {},
                                       child: Padding(
-                                        padding:
+                                        padding:const
                                             EdgeInsets.symmetric(vertical: 13),
                                         child: Card(
                                           elevation: 2,
@@ -367,14 +366,14 @@ class _ProfileState extends State<Profile> {
                                           child: Container(
                                             width: swidth / 2.5,
                                             alignment: Alignment.bottomCenter,
-                                            padding: EdgeInsets.only(top: 10),
+                                            padding:const EdgeInsets.only(top: 10),
                                             decoration: BoxDecoration(
                                               borderRadius:
                                                   BorderRadius.circular(10),
-                                              color: log.isDark
-                                                  ? Color.fromARGB(
+                                              color: themeProvider.isDark
+                                                  ?const Color.fromARGB(
                                                       255, 34, 34, 34)
-                                                  : Color.fromARGB(
+                                                  :const Color.fromARGB(
                                                       255, 244, 244, 244),
                                             ),
                                             child: index > 0
@@ -387,7 +386,7 @@ class _ProfileState extends State<Profile> {
                                                         children: [
                                                           Text(
                                                             data.names[index],
-                                                            style: TextStyle(
+                                                            style:const TextStyle(
                                                                 fontSize: 16,
                                                                 fontWeight:
                                                                     FontWeight
@@ -397,15 +396,15 @@ class _ProfileState extends State<Profile> {
                                                             '3 room weekly',
                                                             style: TextStyle(
                                                                 fontSize: 11,
-                                                                color: log
+                                                                color: themeProvider
                                                                         .isDark
-                                                                    ? Color
+                                                                    ?const Color
                                                                         .fromARGB(
                                                                             255,
                                                                             105,
                                                                             105,
                                                                             105)
-                                                                    : Color
+                                                                    :const Color
                                                                         .fromARGB(
                                                                             255,
                                                                             66,
@@ -432,36 +431,37 @@ class _ProfileState extends State<Profile> {
                                                       ),
                                                     ],
                                                   )
-                                                : Container(
-                                                    child: Column(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
-                                                      children: [
-                                                        Icon(
-                                                          Icons.add,
-                                                          color: Colors
-                                                              .blue.shade600,
-                                                        ),
-                                                        Text(
-                                                          'Create new club',
-                                                          style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600,
-                                                              color: Colors.blue
-                                                                  .shade600),
-                                                        ),
-                                                      ],
-                                                    ),
+                                                : Align(
+
                                                     alignment: Alignment.center,
+                                                  child: Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Icon(
+                                                        Icons.add,
+                                                        color: Colors
+                                                            .blue.shade600,
+                                                      ),
+                                                      Text(
+                                                        'Create new club',
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w600,
+                                                            color: Colors.blue
+                                                                .shade600),
+                                                      ),
+                                                    ],
                                                   ),
+                                                ),
                                           ),
                                         ),
                                       ),
                                     )),
                           ),
-                          SizedBox(
+                         const SizedBox(
                             height: 30,
                           ),
                           Padding(
@@ -476,9 +476,9 @@ class _ProfileState extends State<Profile> {
                                       fontSize: 15,
                                       color: Theme.of(context).primaryColor),
                                 ),
-                                Text(
+                                const Text(
                                   'Show All',
-                                  style: TextStyle(
+                                  style:  TextStyle(
                                       color: Colors.blue,
                                       fontWeight: FontWeight.w600,
                                       fontSize: 12),
@@ -488,7 +488,7 @@ class _ProfileState extends State<Profile> {
                           ),
                           Container(
                             height: 185,
-                            padding: EdgeInsets.only(left: 10),
+                            padding:const EdgeInsets.only(left: 10),
                             child: ListView.builder(
                                 shrinkWrap: true,
                                 itemCount: data.names.length,
@@ -497,7 +497,7 @@ class _ProfileState extends State<Profile> {
                                     GestureDetector(
                                       onTap: () {},
                                       child: Padding(
-                                        padding:
+                                        padding:const
                                             EdgeInsets.symmetric(vertical: 13),
                                         child: Card(
                                           elevation: 2,
@@ -507,14 +507,14 @@ class _ProfileState extends State<Profile> {
                                           child: Container(
                                             width: swidth / 2.5,
                                             alignment: Alignment.bottomCenter,
-                                            padding: EdgeInsets.only(top: 10),
+                                            padding:const EdgeInsets.only(top: 10),
                                             decoration: BoxDecoration(
                                               borderRadius:
                                                   BorderRadius.circular(10),
-                                              color: log.isDark
-                                                  ? Color.fromARGB(
+                                              color: themeProvider.isDark
+                                                  ?const Color.fromARGB(
                                                       255, 34, 34, 34)
-                                                  : Color.fromARGB(
+                                                  :const Color.fromARGB(
                                                       255, 244, 244, 244),
                                             ),
                                             child: Column(
@@ -526,7 +526,7 @@ class _ProfileState extends State<Profile> {
                                                   children: [
                                                     Text(
                                                       data.names[index],
-                                                      style: TextStyle(
+                                                      style:const TextStyle(
                                                           fontSize: 16,
                                                           fontWeight:
                                                               FontWeight.w600),
@@ -535,13 +535,14 @@ class _ProfileState extends State<Profile> {
                                                       '3 room weekly',
                                                       style: TextStyle(
                                                           fontSize: 13,
-                                                          color: log.isDark
-                                                              ? Color.fromARGB(
+                                                          color: themeProvider
+                                                                  .isDark
+                                                              ?const Color.fromARGB(
                                                                   255,
                                                                   105,
                                                                   105,
                                                                   105)
-                                                              : Color.fromARGB(
+                                                              :const Color.fromARGB(
                                                                   255,
                                                                   66,
                                                                   66,
@@ -574,7 +575,7 @@ class _ProfileState extends State<Profile> {
                         ],
                       ),
                       Padding(
-                        padding: EdgeInsets.only(top: 30, bottom: 20, left: 13),
+                        padding:const EdgeInsets.only(top: 30, bottom: 20, left: 13),
                         child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -585,30 +586,30 @@ class _ProfileState extends State<Profile> {
                                     fontWeight: FontWeight.w600,
                                     color: Theme.of(context).primaryColor),
                               ),
-                              SizedBox(
+                            const  SizedBox(
                                 height: 10,
                               ),
-                              Container(
+                              SizedBox(
                                   width: swidth,
                                   child: Wrap(
                                     children: List.generate(
                                         data.topics.length,
                                         (index) => Container(
-                                              margin: EdgeInsets.only(
+                                              margin:const EdgeInsets.only(
                                                   right: 13, top: 13),
-                                              padding: EdgeInsets.symmetric(
+                                              padding:const EdgeInsets.symmetric(
                                                   horizontal: 13, vertical: 3),
                                               decoration: BoxDecoration(
-                                                  color: log.isDark
-                                                      ? Color.fromARGB(
+                                                  color: themeProvider.isDark
+                                                      ?const Color.fromARGB(
                                                           255, 34, 34, 34)
-                                                      : Color.fromARGB(
+                                                      :const Color.fromARGB(
                                                           255, 244, 244, 244),
                                                   borderRadius:
                                                       BorderRadius.circular(8)),
                                               child: Text(
                                                 data.topics[index],
-                                                style: TextStyle(
+                                                style: const TextStyle(
                                                     fontSize: 15,
                                                     fontWeight:
                                                         FontWeight.w500),
@@ -618,11 +619,11 @@ class _ProfileState extends State<Profile> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
-                                          Container(
-                                            margin: EdgeInsets.symmetric(
+                                          Padding(
+                                            padding:const EdgeInsets.symmetric(
                                                 vertical: 20),
                                             child: Row(
-                                              children: [
+                                              children:const [
                                                 Text('Show all topics'),
                                                 Icon(Icons.arrow_drop_down)
                                               ],
@@ -656,7 +657,7 @@ class _ProfileState extends State<Profile> {
                   Navigator.pop(context);
                 },
                 child: FutureBuilder(
-                  future: helper.getImages(data.userData.profile_image!),
+                  future: helper.getImages(data.userData!.profile_image!),
                   builder: ((context, snapshot) {
                     return InteractiveViewer(
                       child: Image.network(

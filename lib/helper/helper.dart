@@ -16,8 +16,8 @@ import 'dart:developer' as logDev;
 class Helper extends ChangeNotifier {
   var uuid = Uuid();
 
-  void configureAmplify() async {
-    if (await Amplify.isConfigured) {
+  Future configureAmplify() async {
+    if (Amplify.isConfigured) {
       return;
     }
     try {
@@ -29,8 +29,9 @@ class Helper extends ChangeNotifier {
           AmplifyStorageS3(),
         ])
       ]);
-      Amplify.configure(amplifyconfig);
-      debugPrint('Amplify configured');
+      await Amplify.configure(amplifyconfig).then((value) {
+        debugPrint('Amplify configured');
+      });
     } on AmplifyAlreadyConfiguredException {
       debugPrint('amplify configuration error');
     }
@@ -122,14 +123,15 @@ class Helper extends ChangeNotifier {
     } on StorageException catch (e) {}
   }
 
-  Future<Map> getOpenedRooms(String token) async {
+  Future<Rooms?> getOpenedRooms(String token, String roomId) async {
     try {
-      const url = 'https://api.videosdk.live/v2/rooms';
+      final url = 'https://api.videosdk.live/v2/rooms/$roomId';
       final http.Response response = await http.get(Uri.parse(url),
           headers: {'Authorization': token}).catchError((error) {
         // TODO an error occured while geting rooms data
-        // TODO sho a diolog
+        // TODO show a diolog
       });
+      //TODO
       // if (jsonDecode(response.body)["error"]
       //     .contains('Token is expired or invalid')) {
       //   // TODO token is expired
@@ -138,7 +140,7 @@ class Helper extends ChangeNotifier {
 
       return jsonDecode(response.body);
     } catch (e) {
-      return {};
+      return null;
     }
   }
 }

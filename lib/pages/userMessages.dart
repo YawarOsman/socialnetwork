@@ -8,6 +8,7 @@ import 'package:socialnetwork/models/Users.dart';
 import 'package:uuid/uuid.dart';
 import '../provider/data.dart';
 import '../provider/log.dart';
+import '../provider/themeProvider.dart';
 import '../submodels/appBars/messageAppBar.dart';
 
 class UserMessages extends StatefulWidget {
@@ -122,7 +123,7 @@ class _UserMessagesState extends State<UserMessages> {
                                                     .userIdSender ==
                                                 context
                                                     .read<Data>()
-                                                    .userData
+                                                    .userData!
                                                     .userId
                                             ? MainAxisAlignment.end
                                             : MainAxisAlignment.start,
@@ -157,57 +158,79 @@ class _UserMessagesState extends State<UserMessages> {
                           }),
                         )
                       : const SizedBox()),
-              Container(
-                padding: const EdgeInsets.only(left: 10, right: 10, bottom: 20),
-                height: 70,
-                decoration: BoxDecoration(
-                  color: log.isDark ? Colors.grey[900] : Colors.grey.shade300,
-                ),
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  child: TextField(
-                    controller: _messageController,
-                    onChanged: (value) {
-                      setState(() {
-                        _messageText = value;
-                      });
-                    },
-                    textAlignVertical: TextAlignVertical.center,
-                    decoration: InputDecoration(
-                        hintText: 'Message',
-                        suffixIcon: _messageText.isEmpty
-                            ? Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                    IconButton(
-                                        onPressed: () {},
-                                        icon: const Icon(Icons.attach_file)),
-                                    IconButton(
-                                        onPressed: () {},
-                                        icon: const Icon(Icons.image)),
-                                  ])
-                            : IconButton(
-                                onPressed: () async {
-                                  final userChats = UserChats(
-                                      userChatId: uuid.v4(),
-                                      userIdSender:
-                                          context.read<Data>().userData.userId,
-                                      userIdReciever: _recieverInfo!.userId,
-                                      content: _messageController.text);
-                                  await Amplify.DataStore.save(userChats)
-                                      .then((value) {
-                                    _messageController.clear();
-                                    setState(() => _messageText = '');
-                                  });
-                                },
-                                icon: const Icon(Icons.send)),
-                        contentPadding: const EdgeInsets.only(left: 12),
-                        suffixIconColor: Colors.blue.shade600,
-                        focusedBorder: InputBorder.none,
-                        enabledBorder: InputBorder.none),
+              Column(
+                children: [
+                 
+                  Container(
+                    width: double.infinity,
+                    height: 0.3,
+                    color: Colors.grey,
                   ),
-                ),
+                  Container(
+                    padding:
+                        const EdgeInsets.only(left: 10, right: 10, bottom: 20),
+                    height: 50,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: context.read<ThemeProvider>().isDark
+                          ? const Color.fromARGB(255, 24, 24, 24)
+                          : Colors.white,
+                    ),
+                    
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      child: TextField(
+                        controller: _messageController,
+                        onChanged: (value) {
+                          setState(() {
+                            _messageText = value;
+                          });
+                        },
+                        textAlignVertical: TextAlignVertical.center,
+                        decoration: InputDecoration(
+                            hintText: 'Message',
+                            suffixIcon: _messageText.isEmpty
+                                ? Padding(
+                                    padding: const EdgeInsets.only(top: 6),
+                                    child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          IconButton(
+                                              onPressed: () {},
+                                              icon: const Icon(
+                                                  Icons.attach_file)),
+                                          IconButton(
+                                              onPressed: () {},
+                                              icon: const Icon(Icons.image)),
+                                        ]),
+                                  )
+                                : IconButton(
+                                    onPressed: () async {
+                                      final userChats = UserChats(
+                                          userChatId: uuid.v4(),
+                                          userIdSender: context
+                                              .read<Data>()
+                                              .userData!
+                                              .userId,
+                                          userIdReciever: _recieverInfo!.userId,
+                                          content: _messageController.text);
+                                      await Amplify.DataStore.save(userChats)
+                                          .then((value) {
+                                        _messageController.clear();
+                                        setState(() => _messageText = '');
+                                      });
+                                    },
+                                    icon: const Icon(Icons.send)),
+                            contentPadding: const EdgeInsets.only(left: 12),
+                            suffixIconColor: Colors.blue.shade600,
+                            focusedBorder: InputBorder.none,
+                            enabledBorder: InputBorder.none),
+                      ),
+                    ),
+                  ),
+                ],
               )
             ]),
       ),

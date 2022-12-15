@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/gestures.dart';
@@ -9,7 +7,7 @@ import '../helper/helper.dart';
 import '../models/Users.dart';
 import '../provider/data.dart';
 import '../provider/log.dart';
-import '../submodels/style.dart';
+import '../submodels/classModels/style.dart';
 import '../widgets/reusableWidgets.dart';
 
 class SignIn extends StatefulWidget {
@@ -24,7 +22,7 @@ class _SignInState extends State<SignIn> {
   final TextEditingController _emailController =
       TextEditingController(text: 'yawarhama@gmail.com');
   final TextEditingController _passwordController =
-      TextEditingController(text: 'Test333@');
+      TextEditingController(text: 'Test333@@');
   final FocusNode _passwordFocusNode = FocusNode();
   final GlobalKey<FormState> _emailKey = GlobalKey<FormState>();
   final GlobalKey<FormState> _passwrodKey = GlobalKey<FormState>();
@@ -37,10 +35,7 @@ class _SignInState extends State<SignIn> {
   @override
   void initState() {
     super.initState();
-    helper.configureAmplify();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      context.read<Log>().setAmplifyConfigured = true;
-    });
+
     _passwordFocusNode.addListener(() => setState(() {
           _passwordFocused = _passwordFocusNode.hasFocus;
         }));
@@ -90,7 +85,7 @@ class _SignInState extends State<SignIn> {
                               ),
                             )),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 15,
                       ),
                       SizedBox(
@@ -175,123 +170,7 @@ class _SignInState extends State<SignIn> {
                         height: 20,
                       ),
                       GestureDetector(
-                        onTap: () async {
-                          if (await data.getInternetConnection ==
-                              ConnectivityResult.none) {
-                            reusableWidgets.showSnackBarForConnectivity(
-                                context, 'No Internet Connection');
-                            return;
-                          }
-                          if (_emailKey.currentState!.validate() &&
-                              _passwrodKey.currentState!.validate()) {
-                            try {
-                              final isEmailValid = RegExp(
-                                      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                                  .hasMatch(_emailController.text);
-                              final isPasswordValid = RegExp(
-                                      r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$')
-                                  .hasMatch(_passwordController.text);
-                              if (!isEmailValid) {
-                                setState(() {
-                                  errorMessage = 'Email is not valid';
-                                });
-                                return;
-                              }
-                              if (!isPasswordValid) {
-                                setState(() {
-                                  errorMessage = 'Password is not valid';
-                                });
-                                return;
-                              }
-                              reusableWidgets.showLoadingDialog(context);
-
-                              final auth =
-                                  await Amplify.Auth.fetchAuthSession();
-                              if (auth.isSignedIn) {
-                                await Amplify.Auth.signOut();
-                              }
-                              await Amplify.Auth.signIn(
-                                      username: _emailController.text,
-                                      password: _passwordController.text)
-                                  .then((value) async {
-                                data.setEmail(_emailController.text);
-
-                                await Amplify.DataStore.query(Users.classType,
-                                        where: Users.EMAIL
-                                            .eq(_emailController.text))
-                                    .then((value) {
-                                  data.setUserData(value.first);
-                                  //todo
-                                  data.setProfileImage();
-                                });
-
-                                log.setIsLoggedIn(true);
-
-                                if (await context.read<Log>().getIsFirstTime) {
-                                  log.setIsFirstTime(false);
-                                }
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(SnackBar(
-                                  dismissDirection: DismissDirection.down,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  behavior: SnackBarBehavior.floating,
-                                  margin: EdgeInsets.symmetric(
-                                    horizontal: 4,
-                                  ),
-                                  content: Container(
-                                    padding: EdgeInsets.symmetric(vertical: 4),
-                                    child: Text(
-                                      'logged in successfully',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          color: Colors.green.shade400),
-                                    ),
-                                  ),
-                                  duration: Duration(seconds: 2),
-                                ));
-                                Navigator.popUntil(
-                                    context, ModalRoute.withName('/home'));
-                                Navigator.pushNamed(context, '/home');
-
-                                return;
-                              }).catchError((error) {
-                                print('SSSSSSSSSSSSSSSSSSSSSS: ${error}');
-                                if (error
-                                    .toString()
-                                    .contains('UnknownException')) {
-                                  setState(() {
-                                    errorMessage =
-                                        'An error occurred, please try again';
-                                    Navigator.pop(context);
-                                    _passwordController.clear();
-                                  });
-                                  Navigator.pop(context);
-                                  return;
-                                } else if (error
-                                    .toString()
-                                    .contains('UserNotFoundException')) {
-                                  setState(() {
-                                    errorMessage =
-                                        'The email or password is incorrect';
-                                    _passwordController.clear();
-                                  });
-                                  Navigator.pop(context);
-                                  return;
-                                }
-                                setState(() {
-                                  errorMessage =
-                                      'An error occurred, please try again';
-                                  Navigator.pop(context);
-                                  _passwordController.clear();
-                                });
-                              });
-                            } on AuthException catch (e) {
-                              debugPrint(e.message);
-                            }
-                          }
-                        },
+                        onTap: () => _logInFunction(data, log),
                         child: Container(
                             width: double.infinity,
                             height: 40,
@@ -334,5 +213,115 @@ class _SignInState extends State<SignIn> {
                     ]),
               )),
         ));
+  }
+
+  _logInFunction(Data data, Log log) async {
+    if (await data.getInternetConnection == ConnectivityResult.none) {
+      reusableWidgets.showSnackBarForConnectivity(
+          context, 'No Internet Connection');
+      return;
+    }
+    if (!Amplify.isConfigured) return;
+    if (_emailKey.currentState!.validate() &&
+        _passwrodKey.currentState!.validate()) {
+      try {
+        final isEmailValid = RegExp(
+                r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+            .hasMatch(_emailController.text);
+        final isPasswordValid = RegExp(
+                r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$')
+            .hasMatch(_passwordController.text);
+        if (!isEmailValid) {
+          setState(() {
+            errorMessage = 'Email is not valid';
+          });
+          return;
+        }
+        if (!isPasswordValid) {
+          setState(() {
+            errorMessage = 'Password is not valid';
+          });
+          return;
+        }
+        reusableWidgets.loadingDialog(context);
+
+        final auth = await Amplify.Auth.fetchAuthSession();
+        if (auth.isSignedIn) {
+          await Amplify.Auth.signOut();
+        }
+        await Amplify.Auth.signIn(
+                username: _emailController.text,
+                password: _passwordController.text)
+            .then((value) async {
+          data.setEmail(_emailController.text);
+          await Amplify.DataStore.query(Users.classType,
+                  where: Users.EMAIL.eq(_emailController.text))
+              .then((value) {
+            data.setUserData(value.first);
+            data.setProfileImage();
+          }).catchError((error) {
+            setState(() {
+              errorMessage = 'An error occurred, please try again';
+              Navigator.pop(context);
+              _passwordController.clear();
+            });
+          });
+
+          log.setIsLoggedIn(true);
+
+          if (await context.read<Log>().getIsFirstTime) {
+            log.setIsFirstTime(false);
+          }
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            dismissDirection: DismissDirection.down,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.symmetric(
+              horizontal: 4,
+            ),
+            content: Container(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Text(
+                'logged in successfully',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.green.shade400),
+              ),
+            ),
+            duration: const Duration(seconds: 2),
+          ));
+          Navigator.popUntil(context, ModalRoute.withName('/home'));
+          Navigator.pushNamed(context, '/home');
+
+          return;
+        }).catchError((error) {
+          print('SSSSSSSSSSSSSSSSSSSSSS: ${error}');
+          if (error.toString().contains('UnknownException')) {
+            setState(() {
+              errorMessage = 'An error occurred, please try again';
+              Navigator.pop(context);
+              _passwordController.clear();
+            });
+            Navigator.pop(context);
+            return;
+          } else if (error.toString().contains('UserNotFoundException')) {
+            setState(() {
+              errorMessage = 'The email or password is incorrect';
+              _passwordController.clear();
+            });
+            Navigator.pop(context);
+            return;
+          }
+          setState(() {
+            errorMessage = 'An error occurred, please try again';
+            Navigator.pop(context);
+            _passwordController.clear();
+          });
+        });
+      } on AuthException catch (e) {
+        debugPrint(e.message);
+      }
+    }
   }
 }

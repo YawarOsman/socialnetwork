@@ -301,6 +301,10 @@ class Users extends Model {
   Map<String, dynamic> toJson() => {
     'id': id, 'userId': _userId, 'userName': _userName, 'email': _email, 'phone': _phone, 'bio': _bio, 'social_links': _social_links, 'profile_image': _profile_image, 'followUsersFollower': _followUsersFollower?.map((FollowUsers? e) => e?.toJson()).toList(), 'followUsersReciever': _followUsersReciever?.map((FollowUsers? e) => e?.toJson()).toList(), 'followClubs': _followClubs?.map((FollowClubs? e) => e?.toJson()).toList(), 'clubs': _clubs?.map((Clubs? e) => e?.toJson()).toList(), 'userTopics': _userTopics?.map((UserTopics? e) => e?.toJson()).toList(), 'userChatSender': _userChatSender?.map((UserChats? e) => e?.toJson()).toList(), 'userChatReciever': _userChatReciever?.map((UserChats? e) => e?.toJson()).toList(), 'participants': _participants?.map((Participants? e) => e?.toJson()).toList(), 'rooms': _rooms?.map((Rooms? e) => e?.toJson()).toList(), 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
+  
+  Map<String, Object?> toMap() => {
+    'id': id, 'userId': _userId, 'userName': _userName, 'email': _email, 'phone': _phone, 'bio': _bio, 'social_links': _social_links, 'profile_image': _profile_image, 'followUsersFollower': _followUsersFollower, 'followUsersReciever': _followUsersReciever, 'followClubs': _followClubs, 'clubs': _clubs, 'userTopics': _userTopics, 'userChatSender': _userChatSender, 'userChatReciever': _userChatReciever, 'participants': _participants, 'rooms': _rooms, 'createdAt': _createdAt, 'updatedAt': _updatedAt
+  };
 
   static final QueryField ID = QueryField(fieldName: "id");
   static final QueryField USERID = QueryField(fieldName: "userId");
@@ -449,7 +453,7 @@ class Users extends Model {
       key: Users.PARTICIPANTS,
       isRequired: false,
       ofModelName: (Participants).toString(),
-      associatedKey: Participants.PARTICIPANTSID
+      associatedKey: Participants.USERID
     ));
     
     modelSchemaDefinition.addField(ModelFieldDefinition.hasMany(

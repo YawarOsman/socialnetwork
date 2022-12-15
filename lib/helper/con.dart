@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import '../widgets/reusableWidgets.dart';
 
 class MyConnectivity {
-  bool isFirsttime = true;
+  bool isFirstTime = true;
   ReusableWidgets reusableWidgets = ReusableWidgets();
 
   MyConnectivity._internal();
@@ -27,14 +27,14 @@ class MyConnectivity {
 
     bool ftime = true;
     connectivity.onConnectivityChanged.listen((result) {
-      if ((result != ConnectivityResult.none) && isFirsttime) {
-        isFirsttime = false;
+      if ((result != ConnectivityResult.none) && isFirstTime) {
+        isFirstTime = false;
         return;
       }
       if ((result == ConnectivityResult.none) &&
-          isFirsttime &&
+          isFirstTime &&
           Platform.isIOS) {
-        isFirsttime = false;
+        isFirstTime = false;
         return;
       }
       if (result != ConnectivityResult.none && ftime && Platform.isIOS) {
@@ -42,14 +42,13 @@ class MyConnectivity {
         return;
       }
       String message = '';
-
       if (result == ConnectivityResult.none) {
         message = 'No Internet Connection';
-      } else if (result == ConnectivityResult.mobile ||
-          result == ConnectivityResult.wifi) {
+        reusableWidgets.showSnackBarForConnectivity(context, message);
+      } else if (result != ConnectivityResult.none && !isFirstTime) {
         message = 'Internet Connection Available';
+        reusableWidgets.showSnackBarForConnectivity(context, message);
       }
-      reusableWidgets.showSnackBarForConnectivity(context, message);
       _checkStatus(result);
     });
 
@@ -57,7 +56,7 @@ class MyConnectivity {
       reusableWidgets.showSnackBarForConnectivity(
           context, 'No Internet Connection');
 
-      isFirsttime = false;
+      isFirstTime = false;
       return;
     }
   }

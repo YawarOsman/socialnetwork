@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../models/Users.dart';
 import '../../provider/data.dart';
 import '../../provider/log.dart';
+import '../../provider/themeProvider.dart';
 
 class MessageAppBar extends StatefulWidget {
   Users? recieverData;
@@ -70,7 +71,7 @@ class _MessageAppBarState extends State<MessageAppBar> {
                 onPressed: () {},
                 icon: Icon(
                   Icons.more_vert,
-                  color: Provider.of<Log>(context, listen: false).isDark
+                  color: context.read<ThemeProvider>().isDark
                       ? Colors.white
                       : Colors.black,
                 ),

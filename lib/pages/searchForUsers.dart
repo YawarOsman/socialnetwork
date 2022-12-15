@@ -6,6 +6,7 @@ import '../helper/helper.dart';
 import '../models/Users.dart';
 import '../provider/data.dart';
 import '../provider/log.dart';
+import '../provider/themeProvider.dart';
 import '../submodels/appBars/allMessagesAppBar.dart';
 import '../submodels/appBars/searchForUsrsAppBar.dart';
 import 'searchDetails.dart';
@@ -134,7 +135,7 @@ class _SearchForUsersState extends State<SearchForUsers> {
                                                                 radius: 20.0,
                                                                 backgroundColor: context
                                                                         .read<
-                                                                            Log>()
+                                                                            ThemeProvider>()
                                                                         .isDark
                                                                     ? Colors
                                                                         .grey
@@ -147,15 +148,14 @@ class _SearchForUsersState extends State<SearchForUsers> {
                                                           }))
                                                       : CircleAvatar(
                                                           radius: 20.0,
-                                                          backgroundColor:
-                                                              context
-                                                                      .read<
-                                                                          Log>()
-                                                                      .isDark
-                                                                  ? Colors.grey
-                                                                      .shade800
-                                                                  : Colors.grey
-                                                                      .shade300,
+                                                          backgroundColor: context
+                                                                  .read<
+                                                                      ThemeProvider>()
+                                                                  .isDark
+                                                              ? Colors
+                                                                  .grey.shade800
+                                                              : Colors.grey
+                                                                  .shade300,
                                                         ),
                                                   const SizedBox(
                                                     width: 20,

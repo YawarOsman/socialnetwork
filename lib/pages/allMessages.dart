@@ -32,7 +32,7 @@ class _AllMessagesState extends State<AllMessages>
   void getUsersYouChattedWith() async {
     //get chats which your or your friend id is in the chat list in UsersChat
     try {
-      myId = context.read<Data>().userData.userId;
+      myId = context.read<Data>().userData!.userId;
 
       await Amplify.DataStore.query(UserChats.classType,
               where: UserChats.USERIDSENDER
@@ -65,7 +65,7 @@ class _AllMessagesState extends State<AllMessages>
   Widget build(BuildContext context) {
     return Consumer2<Data, Log>(
         builder: (context, data, log, child) => Scaffold(
-              appBar: PreferredSize(
+              appBar: const PreferredSize(
                 preferredSize: Size.fromHeight(40),
                 child: AllMessagesAppBar(),
               ),

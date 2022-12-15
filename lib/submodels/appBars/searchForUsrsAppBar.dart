@@ -1,7 +1,4 @@
-import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
-
-import '../../models/Users.dart';
 
 class SearchForUsersAppBar extends StatefulWidget {
   Future Function(String searchValue)? onSearch;
@@ -19,7 +16,7 @@ class _SearchForUsersAppBarState extends State<SearchForUsersAppBar> {
     return AppBar(
         iconTheme: Theme.of(context).iconTheme,
         leadingWidth: 0,
-        leading: SizedBox(width: 0),
+        leading: const SizedBox(width: 0),
         elevation: 0,
         titleSpacing: 0,
         toolbarHeight: 38,
@@ -29,7 +26,7 @@ class _SearchForUsersAppBarState extends State<SearchForUsersAppBar> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: EdgeInsets.only(top: 3),
+                padding: const EdgeInsets.only(top: 3),
                 width: MediaQuery.of(context).size.width * 0.85,
                 height: 38,
                 decoration: BoxDecoration(
@@ -55,12 +52,12 @@ class _SearchForUsersAppBarState extends State<SearchForUsersAppBar> {
                       ),
                       hintText: 'Search',
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.only(left: 13)),
+                      contentPadding: const EdgeInsets.only(left: 13)),
                 ),
               ),
               GestureDetector(
                 onTap: () {},
-                child: Icon(Icons.more_vert),
+                child: const Icon(Icons.more_vert),
               )
             ],
           ),

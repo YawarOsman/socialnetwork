@@ -136,6 +136,10 @@ class RoomChats extends Model {
   Map<String, dynamic> toJson() => {
     'id': id, 'roomChatId': _roomChatId, 'content': _content, 'participantIdSender': _participantIdSender?.toJson(), 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
+  
+  Map<String, Object?> toMap() => {
+    'id': id, 'roomChatId': _roomChatId, 'content': _content, 'participantIdSender': _participantIdSender, 'createdAt': _createdAt, 'updatedAt': _updatedAt
+  };
 
   static final QueryField ID = QueryField(fieldName: "id");
   static final QueryField ROOMCHATID = QueryField(fieldName: "roomChatId");
@@ -156,6 +160,10 @@ class RoomChats extends Model {
           ModelOperation.DELETE,
           ModelOperation.READ
         ])
+    ];
+    
+    modelSchemaDefinition.indexes = [
+      ModelIndex(fields: const ["participantIdSender2"], name: "byParticipants_participantIdSender")
     ];
     
     modelSchemaDefinition.addField(ModelFieldDefinition.id());

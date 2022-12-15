@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../provider/data.dart';
 import '../provider/log.dart';
+import '../provider/themeProvider.dart';
 import 'searchDetails.dart';
 
 class Search extends StatefulWidget {
@@ -103,14 +104,16 @@ class _SearchState extends State<Search> {
                                         padding: EdgeInsets.symmetric(
                                             horizontal: 13, vertical: 3),
                                         decoration: BoxDecoration(
-                                            color:
-                                                _topicsListIndex.contains(index)
-                                                    ? Colors.green.shade600
-                                                    : log.isDark
-                                                        ? Color.fromARGB(
-                                                            255, 34, 34, 34)
-                                                        : Color.fromARGB(
-                                                            255, 244, 244, 244),
+                                            color: _topicsListIndex
+                                                    .contains(index)
+                                                ? Colors.green.shade600
+                                                : context
+                                                        .read<ThemeProvider>()
+                                                        .isDark
+                                                    ? Color.fromARGB(
+                                                        255, 34, 34, 34)
+                                                    : Color.fromARGB(
+                                                        255, 244, 244, 244),
                                             borderRadius:
                                                 BorderRadius.circular(8)),
                                         child: Row(

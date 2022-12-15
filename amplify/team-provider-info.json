@@ -20,6 +20,12 @@
           "deploymentBucketName": "amplify-socialnetwork-socialenv-204550-deployment",
           "s3Key": "amplify-builds/S3Trigger9717b10a-3668446b457443596974-build.zip"
         }
+      },
+      "api": {
+        "socialnetwork": {}
+      },
+      "storage": {
+        "socialnetwork": {}
       }
     }
   }

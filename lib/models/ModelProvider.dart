@@ -37,6 +37,7 @@ export 'FollowUsers.dart';
 export 'Participants.dart';
 export 'RoomChats.dart';
 export 'Rooms.dart';
+export 'Status.dart';
 export 'Topics.dart';
 export 'UserChats.dart';
 export 'UserTopics.dart';
@@ -44,7 +45,7 @@ export 'Users.dart';
 
 class ModelProvider implements ModelProviderInterface {
   @override
-  String version = "d907e2c85b77c7c78cb2954013d6be36";
+  String version = "a0c54ddb3f2bf356b546afa9618095b3";
   @override
   List<ModelSchema> modelSchemas = [Clubs.schema, FollowClubs.schema, FollowUsers.schema, Participants.schema, RoomChats.schema, Rooms.schema, Topics.schema, UserChats.schema, UserTopics.schema, Users.schema];
   static final ModelProvider _instance = ModelProvider();

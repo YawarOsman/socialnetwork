@@ -30,11 +30,11 @@ import 'package:flutter/foundation.dart';
 class Participants extends Model {
   static const classType = const _ParticipantsModelType();
   final String id;
+  final String? _participantsId;
   final String? _role;
-  final TemporalDateTime? _joinDate;
-  final String? _peeringId;
-  final Users? _participantsId;
+  final Users? _userId;
   final Rooms? _roomId;
+  final Status? _participantStatus;
   final List<RoomChats>? _participantIdSender;
   final TemporalDateTime? _createdAt;
   final TemporalDateTime? _updatedAt;
@@ -47,33 +47,24 @@ class Participants extends Model {
     return id;
   }
   
+  String? get participantsId {
+    return _participantsId;
+  }
+  
   String? get role {
     return _role;
   }
   
-  TemporalDateTime? get joinDate {
-    return _joinDate;
-  }
-  
-  String get peeringId {
-    try {
-      return _peeringId!;
-    } catch(e) {
-      throw new AmplifyCodeGenModelException(
-          AmplifyExceptionMessages.codeGenRequiredFieldForceCastExceptionMessage,
-          recoverySuggestion:
-            AmplifyExceptionMessages.codeGenRequiredFieldForceCastRecoverySuggestion,
-          underlyingException: e.toString()
-          );
-    }
-  }
-  
-  Users? get participantsId {
-    return _participantsId;
+  Users? get userId {
+    return _userId;
   }
   
   Rooms? get roomId {
     return _roomId;
+  }
+  
+  Status? get participantStatus {
+    return _participantStatus;
   }
   
   List<RoomChats>? get participantIdSender {
@@ -88,16 +79,16 @@ class Participants extends Model {
     return _updatedAt;
   }
   
-  const Participants._internal({required this.id, role, joinDate, required peeringId, participantsId, roomId, participantIdSender, createdAt, updatedAt}): _role = role, _joinDate = joinDate, _peeringId = peeringId, _participantsId = participantsId, _roomId = roomId, _participantIdSender = participantIdSender, _createdAt = createdAt, _updatedAt = updatedAt;
+  const Participants._internal({required this.id, participantsId, role, userId, roomId, participantStatus, participantIdSender, createdAt, updatedAt}): _participantsId = participantsId, _role = role, _userId = userId, _roomId = roomId, _participantStatus = participantStatus, _participantIdSender = participantIdSender, _createdAt = createdAt, _updatedAt = updatedAt;
   
-  factory Participants({String? id, String? role, TemporalDateTime? joinDate, required String peeringId, Users? participantsId, Rooms? roomId, List<RoomChats>? participantIdSender}) {
+  factory Participants({String? id, String? participantsId, String? role, Users? userId, Rooms? roomId, Status? participantStatus, List<RoomChats>? participantIdSender}) {
     return Participants._internal(
       id: id == null ? UUID.getUUID() : id,
-      role: role,
-      joinDate: joinDate,
-      peeringId: peeringId,
       participantsId: participantsId,
+      role: role,
+      userId: userId,
       roomId: roomId,
+      participantStatus: participantStatus,
       participantIdSender: participantIdSender != null ? List<RoomChats>.unmodifiable(participantIdSender) : participantIdSender);
   }
   
@@ -110,11 +101,11 @@ class Participants extends Model {
     if (identical(other, this)) return true;
     return other is Participants &&
       id == other.id &&
-      _role == other._role &&
-      _joinDate == other._joinDate &&
-      _peeringId == other._peeringId &&
       _participantsId == other._participantsId &&
+      _role == other._role &&
+      _userId == other._userId &&
       _roomId == other._roomId &&
+      _participantStatus == other._participantStatus &&
       DeepCollectionEquality().equals(_participantIdSender, other._participantIdSender);
   }
   
@@ -127,11 +118,11 @@ class Participants extends Model {
     
     buffer.write("Participants {");
     buffer.write("id=" + "$id" + ", ");
+    buffer.write("participantsId=" + "$_participantsId" + ", ");
     buffer.write("role=" + "$_role" + ", ");
-    buffer.write("joinDate=" + (_joinDate != null ? _joinDate!.format() : "null") + ", ");
-    buffer.write("peeringId=" + "$_peeringId" + ", ");
-    buffer.write("participantsId=" + (_participantsId != null ? _participantsId!.toString() : "null") + ", ");
+    buffer.write("userId=" + (_userId != null ? _userId!.toString() : "null") + ", ");
     buffer.write("roomId=" + (_roomId != null ? _roomId!.toString() : "null") + ", ");
+    buffer.write("participantStatus=" + (_participantStatus != null ? enumToString(_participantStatus)! : "null") + ", ");
     buffer.write("createdAt=" + (_createdAt != null ? _createdAt!.format() : "null") + ", ");
     buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt!.format() : "null"));
     buffer.write("}");
@@ -139,28 +130,28 @@ class Participants extends Model {
     return buffer.toString();
   }
   
-  Participants copyWith({String? id, String? role, TemporalDateTime? joinDate, String? peeringId, Users? participantsId, Rooms? roomId, List<RoomChats>? participantIdSender}) {
+  Participants copyWith({String? id, String? participantsId, String? role, Users? userId, Rooms? roomId, Status? participantStatus, List<RoomChats>? participantIdSender}) {
     return Participants._internal(
       id: id ?? this.id,
-      role: role ?? this.role,
-      joinDate: joinDate ?? this.joinDate,
-      peeringId: peeringId ?? this.peeringId,
       participantsId: participantsId ?? this.participantsId,
+      role: role ?? this.role,
+      userId: userId ?? this.userId,
       roomId: roomId ?? this.roomId,
+      participantStatus: participantStatus ?? this.participantStatus,
       participantIdSender: participantIdSender ?? this.participantIdSender);
   }
   
   Participants.fromJson(Map<String, dynamic> json)  
     : id = json['id'],
+      _participantsId = json['participantsId'],
       _role = json['role'],
-      _joinDate = json['joinDate'] != null ? TemporalDateTime.fromString(json['joinDate']) : null,
-      _peeringId = json['peeringId'],
-      _participantsId = json['participantsId']?['serializedData'] != null
-        ? Users.fromJson(new Map<String, dynamic>.from(json['participantsId']['serializedData']))
+      _userId = json['userId']?['serializedData'] != null
+        ? Users.fromJson(new Map<String, dynamic>.from(json['userId']['serializedData']))
         : null,
       _roomId = json['roomId']?['serializedData'] != null
         ? Rooms.fromJson(new Map<String, dynamic>.from(json['roomId']['serializedData']))
         : null,
+      _participantStatus = enumFromString<Status>(json['participantStatus'], Status.values),
       _participantIdSender = json['participantIdSender'] is List
         ? (json['participantIdSender'] as List)
           .where((e) => e?['serializedData'] != null)
@@ -171,19 +162,23 @@ class Participants extends Model {
       _updatedAt = json['updatedAt'] != null ? TemporalDateTime.fromString(json['updatedAt']) : null;
   
   Map<String, dynamic> toJson() => {
-    'id': id, 'role': _role, 'joinDate': _joinDate?.format(), 'peeringId': _peeringId, 'participantsId': _participantsId?.toJson(), 'roomId': _roomId?.toJson(), 'participantIdSender': _participantIdSender?.map((RoomChats? e) => e?.toJson()).toList(), 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
+    'id': id, 'participantsId': _participantsId, 'role': _role, 'userId': _userId?.toJson(), 'roomId': _roomId?.toJson(), 'participantStatus': enumToString(_participantStatus), 'participantIdSender': _participantIdSender?.map((RoomChats? e) => e?.toJson()).toList(), 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
+  };
+  
+  Map<String, Object?> toMap() => {
+    'id': id, 'participantsId': _participantsId, 'role': _role, 'userId': _userId, 'roomId': _roomId, 'participantStatus': _participantStatus, 'participantIdSender': _participantIdSender, 'createdAt': _createdAt, 'updatedAt': _updatedAt
   };
 
   static final QueryField ID = QueryField(fieldName: "id");
+  static final QueryField PARTICIPANTSID = QueryField(fieldName: "participantsId");
   static final QueryField ROLE = QueryField(fieldName: "role");
-  static final QueryField JOINDATE = QueryField(fieldName: "joinDate");
-  static final QueryField PEERINGID = QueryField(fieldName: "peeringId");
-  static final QueryField PARTICIPANTSID = QueryField(
-    fieldName: "participantsId",
+  static final QueryField USERID = QueryField(
+    fieldName: "userId",
     fieldType: ModelFieldType(ModelFieldTypeEnum.model, ofModelName: (Users).toString()));
   static final QueryField ROOMID = QueryField(
     fieldName: "roomId",
     fieldType: ModelFieldType(ModelFieldTypeEnum.model, ofModelName: (Rooms).toString()));
+  static final QueryField PARTICIPANTSTATUS = QueryField(fieldName: "participantStatus");
   static final QueryField PARTICIPANTIDSENDER = QueryField(
     fieldName: "participantIdSender",
     fieldType: ModelFieldType(ModelFieldTypeEnum.model, ofModelName: (RoomChats).toString()));
@@ -202,7 +197,18 @@ class Participants extends Model {
         ])
     ];
     
+    modelSchemaDefinition.indexes = [
+      ModelIndex(fields: const ["userId2"], name: "byUser_participants"),
+      ModelIndex(fields: const ["roomId2"], name: "byRoom_participants")
+    ];
+    
     modelSchemaDefinition.addField(ModelFieldDefinition.id());
+    
+    modelSchemaDefinition.addField(ModelFieldDefinition.field(
+      key: Participants.PARTICIPANTSID,
+      isRequired: false,
+      ofType: ModelFieldType(ModelFieldTypeEnum.string)
+    ));
     
     modelSchemaDefinition.addField(ModelFieldDefinition.field(
       key: Participants.ROLE,
@@ -210,22 +216,10 @@ class Participants extends Model {
       ofType: ModelFieldType(ModelFieldTypeEnum.string)
     ));
     
-    modelSchemaDefinition.addField(ModelFieldDefinition.field(
-      key: Participants.JOINDATE,
-      isRequired: false,
-      ofType: ModelFieldType(ModelFieldTypeEnum.dateTime)
-    ));
-    
-    modelSchemaDefinition.addField(ModelFieldDefinition.field(
-      key: Participants.PEERINGID,
-      isRequired: true,
-      ofType: ModelFieldType(ModelFieldTypeEnum.string)
-    ));
-    
     modelSchemaDefinition.addField(ModelFieldDefinition.belongsTo(
-      key: Participants.PARTICIPANTSID,
+      key: Participants.USERID,
       isRequired: false,
-      targetName: "participantsId2",
+      targetName: "userId2",
       ofModelName: (Users).toString()
     ));
     
@@ -234,6 +228,12 @@ class Participants extends Model {
       isRequired: false,
       targetName: "roomId2",
       ofModelName: (Rooms).toString()
+    ));
+    
+    modelSchemaDefinition.addField(ModelFieldDefinition.field(
+      key: Participants.PARTICIPANTSTATUS,
+      isRequired: false,
+      ofType: ModelFieldType(ModelFieldTypeEnum.enumeration)
     ));
     
     modelSchemaDefinition.addField(ModelFieldDefinition.hasMany(

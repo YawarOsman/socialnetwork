@@ -66,20 +66,26 @@ type Rooms @model @auth(rules: [{allow: public}]) {
   name: String!
   description: String
   dateTime: AWSDateTime
+  roomStatus: Status
   founderId2: ID! @index(name: "byUser_rooms")
   founderId: Users @belongsTo(fields: ["founderId2"])
   participants: [Participants] @hasMany(indexName: "byRoom_participants", fields: ["roomId"])
 }
 
 type Participants @model @auth(rules: [{allow: public}]) {
-  participantsId2: ID! @index(name: "byUser_participants")
+  participantsId: ID
   role: String
-  joinDate: AWSDateTime
-  peeringId: ID!
+  userId2: ID! @index(name: "byUser_participants")
+  userId: Users @belongsTo(fields: ["userId2"])
   roomId2: ID! @index(name: "byRoom_participants")
-  participantsId: Users @belongsTo(fields: ["participantsId2"])
   roomId: Rooms @belongsTo(fields: ["roomId2"])
-  participantIdSender: [RoomChats] @hasMany(indexName: "byParticipants_participantIdSender", fields: ["participantsId2"])
+  participantStatus: Status
+  participantIdSender: [RoomChats] @hasMany(indexName: "byParticipants_participantIdSender", fields: ["participantsId"])
+}
+
+enum Status {
+  active
+  inactive
 }
 
 type RoomChats @model @auth(rules: [{allow: public}]) {
@@ -87,4 +93,5 @@ type RoomChats @model @auth(rules: [{allow: public}]) {
   content: String
   participantIdSender2: ID! @index(name: "byParticipants_participantIdSender")
   participantIdSender: Participants @belongsTo(fields: ["participantIdSender2"])
-} 
+}
+ 

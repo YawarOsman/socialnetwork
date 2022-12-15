@@ -6,10 +6,9 @@ import '../../models/Users.dart';
 import '../helper/helper.dart';
 
 class Data extends ChangeNotifier {
-  Helper helper = Helper();
-  List _rooms = [];
+  final Helper helper = Helper();
   List _name = [
-    'Roberto Berry',
+    'Roberto Berrys',
     'Ray Kavita',
     'Williams Kishi',
     'Meya Navid',
@@ -99,12 +98,12 @@ class Data extends ChangeNotifier {
     'hello dude, how is it going?',
   ];
   String _email = '';
-  late Users _userData;
+  Users? _userData;
   String _profileImage = '';
 
   get email => _email;
 
-  Users get userData => _userData;
+  Users? get userData => _userData;
 
   Future get getEmail async {
     final prefs = await SharedPreferences.getInstance();
@@ -117,8 +116,10 @@ class Data extends ChangeNotifier {
     await Amplify.DataStore.query(Users.classType,
             where: Users.EMAIL.eq(_email))
         .then((value) {
-      _userData = value.first;
-      notifyListeners();
+      if (value.isNotEmpty) {
+        _userData = value.first;
+        notifyListeners();
+      }
     });
   }
 
@@ -127,25 +128,15 @@ class Data extends ChangeNotifier {
     return connection;
   }
 
-  get names {
-    return _name;
-  }
+  get names => _name;
 
-  get photos {
-    return _photo;
-  }
+  get photos => _photo;
 
-  get topics {
-    return _topics;
-  }
+  get topics => _topics;
 
-  get messages {
-    return _messages;
-  }
+  get messages => _messages;
 
   get profileImage => _profileImage;
-
-  List get rooms => _rooms;
 
   void removeEmail() async {
     _email = '';
@@ -173,10 +164,5 @@ class Data extends ChangeNotifier {
     // }
     // _profileImage = profile_image ?? '';
     // notifyListeners();
-  }
-
-  void setRooms(List rooms) async {
-    _rooms = rooms;
-    notifyListeners();
   }
 }

@@ -8,7 +8,7 @@ import 'package:uuid/uuid.dart';
 import '../helper/helper.dart';
 import '../provider/data.dart';
 import '../provider/log.dart';
-import '../submodels/style.dart';
+import '../submodels/classModels/style.dart';
 import '../widgets/reusableWidgets.dart';
 import 'signupOTP.dart';
 
@@ -204,7 +204,7 @@ class _SignUpState extends State<SignUp> {
                       return;
                     }
 
-                    reusableWidgets.showLoadingDialog(context);
+                    reusableWidgets.loadingDialog(context);
 
                     await Amplify.Auth.signOut();
                     final _isEmailUsed = await Amplify.Auth.signIn(
